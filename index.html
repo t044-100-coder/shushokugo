@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ことわざ冒険RPG - 100選マスターへの道</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #2b1055;
+            color: #333;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .title-font {
+            font-family: 'Yusei Magic', sans-serif;
+        }
+        .ruby-text ruby {
+            ruby-position: over;
+        }
+        .ruby-text rt {
+            font-size: 0.55em;
+            color: #d97706;
+            font-weight: bold;
+        }
+        .game-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+        .btn-bounce {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.96) translateY(4px);
+            box-shadow: none !important;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.8)); }
+            50% { filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.4)); }
+        }
+        .glow-effect {
+            animation: pulse-glow 2s infinite;
+        }
+        /* Custom Scrollbar for Zukan */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 bg-slate-900 text-slate-800">
+
+    <div id="app" class="w-full max-w-2xl bg-slate-800 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-400 relative min-h-[640px] flex flex-col justify-between">
+        
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 p-3 sm:p-4 text-white flex justify-between items-center border-b-4 border-amber-300 shadow-md">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-scroll text-2xl text-amber-200"></i>
+                <h1 class="text-xl sm:text-2xl font-black title-font tracking-wide">ことわざ冒険<span class="text-xs bg-amber-800 text-amber-200 px-2 py-0.5 rounded-full ml-1">小4・受験100選</span></h1>
+            </div>
+            <div id="user-status" class="flex items-center space-x-3 text-sm font-bold bg-amber-900/40 px-3 py-1 rounded-full border border-amber-300/30">
+                <span>Lv.<span id="user-level">1</span></span>
+                <span class="text-amber-300" id="user-title">見習い勇者</span>
+            </div>
+        </header>
+
+        <!-- Start Screen -->
+        <main id="start-screen" class="p-6 flex-1 flex flex-col justify-between items-center text-center bg-gradient-to-b from-indigo-900 via-purple-900 to-slate-900 text-white relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl"></div>
+
+            <div class="mt-4 z-10">
+                <div class="inline-block bg-amber-500/20 text-amber-300 border border-amber-400/40 px-4 py-1 rounded-full text-xs sm:text-sm font-bold mb-3">
+                    語彙力アップ！目指せことわざ100コンプリート！
+                </div>
+                <h2 class="text-3xl sm:text-5xl font-extrabold title-font text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 mb-2 glow-effect">
+                    ことわざ冒険<br>〜100選マスター〜
+                </h2>
+                <p class="text-indigo-200 text-sm sm:text-base mt-2">クイズにこたえて モンスターをやっつけよう！</p>
+            </div>
+
+            <!-- Avatar -->
+            <div class="my-4 z-10 relative">
+                <div class="w-32 h-32 sm:w-36 sm:h-36 bg-gradient-to-b from-amber-300 to-orange-400 rounded-full flex items-center justify-center border-4 border-white shadow-xl mx-auto transform hover:scale-105 transition-all duration-300">
+                    <i class="fa-solid fa-dragon text-6xl sm:text-7xl text-slate-900"></i>
+                </div>
+                <div class="bg-amber-400 text-slate-900 font-extrabold text-xs px-3 py-1 rounded-full border border-white absolute -bottom-2 left-1/2 transform -translate-x-1/2 shadow whitespace-nowrap">
+                    厳選100ことわざ 収録！
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="w-full space-y-3 z-10 max-w-sm mb-2">
+                <button id="start-btn" class="btn-bounce w-full bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-slate-900 font-black text-xl py-4 rounded-2xl border-b-4 border-emerald-700 shadow-lg flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-play"></i>
+                    <span>ぼうけんを はじめる！</span>
+                </button>
+                <button id="zukan-btn" class="btn-bounce w-full bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-500 hover:to-indigo-600 text-white font-bold text-lg py-3 rounded-2xl border-b-4 border-indigo-800 shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>ことわざ ずかん (100選)</span>
+                </button>
+            </div>
+        </main>
+
+        <!-- Quiz Screen -->
+        <main id="quiz-screen" class="hidden p-4 sm:p-6 flex-1 flex flex-col justify-between bg-slate-900 relative">
+            
+            <!-- Battle Status Area -->
+            <div class="bg-slate-800/80 rounded-2xl p-3 border border-slate-700 mb-2 flex items-center justify-between text-white">
+                <div class="flex items-center space-x-2">
+                    <span id="combo-badge" class="hidden bg-gradient-to-r from-amber-500 to-red-500 text-white text-xs font-black px-2 py-1 rounded-lg animate-bounce">
+                        <i class="fa-solid fa-fire"></i> <span id="combo-count">2</span> れんぞく！
+                    </span>
+                    <span class="text-xs text-slate-400">だい <span id="current-q-num" class="text-amber-400 font-bold text-base">1</span> / <span id="total-q-num">5</span> もん</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right">
+                        <div class="text-xs text-slate-400">スコア</div>
+                        <div id="quiz-score" class="font-black text-amber-400 text-lg">0</div>
+                    </div>
+                    <!-- トップページに戻るボタン -->
+                    <button id="quiz-quit-btn" class="bg-slate-700 hover:bg-slate-600 text-xs text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600 font-bold flex items-center space-x-1">
+                        <i class="fa-solid fa-house"></i>
+                        <span>タイトル</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Monster Box -->
+            <div class="bg-gradient-to-b from-indigo-950 to-slate-800 rounded-2xl p-3 border-2 border-indigo-500/30 text-center relative mb-3 shadow-inner flex flex-col items-center justify-center min-h-[130px]">
+                <div id="monster-avatar" class="text-5xl sm:text-6xl mb-1 transition-transform duration-200">
+                    👾
+                </div>
+                <div id="monster-name" class="text-amber-300 font-bold text-sm">ことわざモグラ</div>
+                <div class="w-36 bg-slate-700 h-2.5 rounded-full mt-1.5 overflow-hidden border border-slate-600">
+                    <div id="monster-hp" class="bg-red-500 h-full w-full transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Question Box -->
+            <div id="question-card" class="game-card rounded-2xl p-4 mb-3 border-2 border-amber-300 shadow-xl min-h-[120px] flex flex-col justify-center">
+                <div class="text-xs font-bold text-amber-800 bg-amber-100 inline-block px-2.5 py-0.5 rounded-full mb-2 w-max ruby-text" id="q-type-badge">
+                    💡 <ruby>意味<rt>いみ</rt></ruby>から 当てよう！
+                </div>
+                <div id="question-text" class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed ruby-text">
+                    <!-- Dynamic Question Text with Ruby -->
+                </div>
+            </div>
+
+            <!-- Answer Options Grid -->
+            <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-1">
+                <!-- Dynamic Buttons -->
+            </div>
+        </main>
+
+        <!-- Result Screen -->
+        <main id="result-screen" class="hidden p-6 flex-1 flex flex-col justify-between items-center text-center bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white">
+            <div class="mt-2">
+                <div class="text-amber-400 text-4xl sm:text-5xl mb-2">
+                    <i class="fa-solid fa-trophy animate-bounce"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold title-font text-white">ぼうけん くりあ！</h2>
+                <p class="text-indigo-200 text-sm mt-1">よく がんばったね！語彙力がアップしたぞ！</p>
+            </div>
+
+            <div class="w-full max-w-sm bg-slate-800/90 rounded-2xl p-5 border-2 border-amber-400/50 shadow-xl my-3 text-left space-y-3">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                    <span class="text-slate-400 text-sm">せいかい数</span>
+                    <span class="text-xl font-bold text-emerald-400"><span id="result-correct">0</span> / <span id="result-total">5</span> もん</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                    <span class="text-slate-400 text-sm">かくとく スコア</span>
+                    <span id="result-score" class="text-2xl font-black text-amber-300">0 点</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                    <span class="text-slate-400 text-sm">かくとく EXP</span>
+                    <span id="result-exp" class="text-lg font-bold text-purple-300">+0 EXP</span>
+                </div>
+                <div class="pt-1">
+                    <div class="text-xs text-amber-300 font-bold mb-1" id="level-up-msg"></div>
+                    <div class="w-full bg-slate-700 h-3 rounded-full overflow-hidden">
+                        <div id="exp-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-0 transition-all duration-1000"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full space-y-2 max-w-sm mb-2">
+                <button id="retry-btn" class="btn-bounce w-full bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-slate-900 font-black text-lg py-3.5 rounded-2xl border-b-4 border-emerald-700 shadow-lg flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>もういちど チャレンジ！</span>
+                </button>
+                <button id="back-to-start-btn" class="btn-bounce w-full bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm py-2.5 rounded-xl border-b-2 border-slate-900">
+                    タイトルへ もどる
+                </button>
+            </div>
+        </main>
+
+        <!-- Zukan Screen -->
+        <main id="zukan-screen" class="hidden p-4 sm:p-5 flex-1 flex flex-col bg-slate-900 text-white">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-lg font-bold title-font text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open"></i> ことわざ 100選図鑑
+                </h2>
+                <span class="text-xs bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+                    はっけん: <span id="zukan-count" class="text-amber-400 font-bold">0</span>/100
+                </span>
+            </div>
+
+            <!-- Category Filter Tabs -->
+            <div id="zukan-categories" class="flex space-x-2 overflow-x-auto pb-2 mb-2 text-xs border-b border-slate-800">
+                <!-- Dynamically generated category badges -->
+            </div>
+
+            <!-- Scrollable Zukan List -->
+            <div id="zukan-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 max-h-[380px]">
+                <!-- Zukan Items Injected JS -->
+            </div>
+
+            <button id="zukan-back-btn" class="btn-bounce mt-3 w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl border-b-2 border-slate-900">
+                もどる
+            </button>
+        </main>
+
+    </div>
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'kotowaza-rpg-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+
+        if (firebaseConfig) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                const initAuth = async () => {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    currentUser = auth.currentUser;
+                    window.loadGameData();
+                };
+                initAuth();
+            } catch (e) {
+                console.error("Firebase Auth initialization failed:", e);
+            }
+        }
+
+        window.saveGameData = async function() {
+            if (!db || !currentUser) return;
+            try {
+                const dataRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'progress');
+                await setDoc(dataRef, {
+                    level: gameState.level,
+                    exp: gameState.exp,
+                    unlockedProverbs: Array.from(gameState.unlockedProverbs),
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (e) {
+                console.error("Failed to save progress:", e);
+            }
+        };
+
+        window.loadGameData = async function() {
+            if (!db || !currentUser) return;
+            try {
+                const dataRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'progress');
+                const docSnap = await getDoc(dataRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.level) gameState.level = data.level;
+                    if (data.exp) gameState.exp = data.exp;
+                    if (data.unlockedProverbs) gameState.unlockedProverbs = new Set(data.unlockedProverbs);
+                    updateTitleAndLevel();
+                }
+            } catch (e) {
+                console.error("Failed to load progress:", e);
+            }
+        };
+    </script>
+
+    <!-- JavaScript Logic -->
+    <script>
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playCorrect() {
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                osc.frequency.setValueAtTime(1046.50, now + 0.3);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+            playWrong() {
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.setValueAtTime(180, now + 0.15);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            }
+            playLevelUp() {
+                this.init();
+                const now = this.ctx.currentTime;
+                const notes = [440, 554.37, 659.25, 880];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + idx * 0.1);
+                    osc.stop(now + idx * 0.1 + 0.3);
+                });
+            }
+        }
+
+        const sound = new SoundFX();
+
+        // 100選のことわざ（問題文（meaning）および用例（example）のすべての漢字にふりがな付与）
+        const PROVERBS = [
+            // 【1. 生き物・動物のことわざ】
+            { id: 1, cat: "生き物・動物", kotowaza: "<ruby>猫<rt>ねこ</rt></ruby>に<ruby>小判<rt>こばん</rt></ruby>", plain: "猫に小判", meaning: "どんなに<ruby>価値<rt>かち</rt></ruby>のあるものでも、<ruby>価値<rt>かち</rt></ruby>が<ruby>分<rt>わ</rt></ruby>からない<ruby>人<rt>ひと</rt></ruby>には<ruby>何<rt>なに</rt></ruby>の<ruby>役<rt>やく</rt></ruby>にも<ruby>立<rt>た</rt></ruby>たないこと。", example: "「ゲームをやらない<ruby>弟<rt>おとうと</rt></ruby>に<ruby>高級<rt>こうきゅう</rt></ruby>ゲーム<ruby>機<rt>き</rt></ruby>をあげても、<ruby>猫<rt>ねこ</rt></ruby>に<ruby>小判<rt>こばん</rt></ruby>だよ。」" },
+            { id: 2, cat: "生き物・動物", kotowaza: "<ruby>犬<rt>いぬ</rt></ruby>も<ruby>歩<rt>ある</rt></ruby>けば<ruby>棒<rt>ぼう</rt></ruby>に<ruby>当<rt>あ</rt></ruby>たる", plain: "犬も歩けば棒に当たる", meaning: "<ruby>何<rt>なに</rt></ruby>か<ruby>行動<rt>こうどう</rt></ruby>を<ruby>起<rt>お</rt></ruby>こせば、<ruby>思<rt>おも</rt></ruby>わぬ<ruby>幸運<rt>こううん</rt></ruby>や<ruby>災難<rt>さいなん</rt></ruby>に<ruby>遭<rt>あ</rt></ruby>うこと。", example: "「<ruby>散歩<rt>さんぽ</rt></ruby>していたら<ruby>欲<rt>ほ</rt></ruby>しかった<ruby>本<rt>ほん</rt></ruby>を見つけたよ。<ruby>犬<rt>いぬ</rt></ruby>も<ruby>歩<rt>ある</rt></ruby>けば<ruby>棒<rt>ぼう</rt></ruby>に<ruby>当<rt>あ</rt></ruby>たるだね。」" },
+            { id: 3, cat: "生き物・動物", kotowaza: "<ruby>井<rt>い</rt></ruby>の中の<ruby>蛙<rt>かわず</rt></ruby><ruby>大海<rt>たいかい</rt></ruby>を知らず", plain: "井の中の蛙大海を知らず", meaning: "<ruby>自分<rt>じぶん</rt></ruby>の<ruby>狭<rt>せま</rt></ruby>い<ruby>世界<rt>せかい</rt></ruby>に<ruby>閉<rt>と</rt></ruby>じこもり、<ruby>外<rt>そと</rt></ruby>の<ruby>広<rt>ひろ</rt></ruby>い<ruby>世界<rt>せかい</rt></ruby>を<ruby>知<rt>し</rt></ruby>らないこと。", example: "「<ruby>学校<rt>がっこう</rt></ruby>で１<ruby>番<rt>ばん</rt></ruby><ruby>足<rt>あし</rt></ruby>が<ruby>速<rt>はや</rt></ruby>くても、<ruby>井<rt>い</rt></ruby>の中の<ruby>蛙<rt>かわず</rt></ruby>にならないよう<ruby>大会<rt>たいかい</rt></ruby>でがんばろう。」" },
+            { id: 4, cat: "生き物・動物", kotowaza: "<ruby>能<rt>のう</rt></ruby>ある<ruby>鷹<rt>たか</rt></ruby>は<ruby>爪<rt>つめ</rt></ruby>を<ruby>隠<rt>かく</rt></ruby>す", plain: "能ある鷹は爪を隠す", meaning: "<ruby>本当<rt>ほんとう</rt></ruby>に<ruby>優<rt>ぐん</rt></ruby>れた<ruby>才能<rt>さいのう</rt></ruby>や<ruby>実力<rt>じつりょく</rt></ruby>がある<ruby>人<rt>ひと</rt></ruby>は、それを見せびらかさないこと。", example: "「<ruby>普段<rt>ふだん</rt></ruby>はおとなしい<ruby>彼<rt>かれ</rt></ruby>が<ruby>実<rt>じつ</rt></ruby>はピアノの<ruby>名手<rt>めいしゅ</rt></ruby>だなんて、<ruby>能<rt>のう</rt></ruby>ある<ruby>鷹<rt>たか</rt></ruby>は<ruby>爪<rt>つめ</rt></ruby>を<ruby>隠<rt>かく</rt></ruby>すだね。」" },
+            { id: 5, cat: "生き物・動物", kotowaza: "<ruby>捕<rt>と</rt></ruby>らぬ<ruby>狸<rt>たぬき</rt></ruby>の<ruby>皮算用<rt>かわざんよう</rt></ruby>", plain: "捕らぬ狸の皮算用", meaning: "<ruby>手<rt>て</rt></ruby>に<ruby>入<rt>はい</rt></ruby>るか<ruby>確実<rt>かくじつ</rt></ruby>でない<ruby>段階<rt>だんかい</rt></ruby>から、あれこれ<ruby>都合<rt>つごう</rt></ruby>よく<ruby>計画<rt>けいかく</rt></ruby>を<ruby>立<rt>た</rt></ruby>てること。", example: "「テストを<ruby>受<rt>う</rt></ruby>ける<ruby>前<rt>まえ</rt></ruby>から100<ruby>点<rt>てん</rt></ruby><ruby>取<rt>と</rt></ruby>ったら<ruby>何<rt>なに</rt></ruby><ruby>買<rt>か</rt></ruby>おうか<ruby>考<rt>かんが</rt></ruby>えるのは、<ruby>捕<rt>と</rt></ruby>らぬ<ruby>狸<rt>たぬき</rt></ruby>の<ruby>皮算用<rt>かわざんよう</rt></ruby>だよ。」" },
+            { id: 6, cat: "生き物・動物", kotowaza: "<ruby>虎<rt>とら</rt></ruby>の<ruby>威<rt>い</rt></ruby>を<ruby>借<rt>か</rt></ruby>る<ruby>狐<rt>きつね</rt></ruby>", plain: "虎の威を借る狐", meaning: "<ruby>自分<rt>じぶん</rt></ruby>には<ruby>力<rt>ちから</rt></ruby>がないのに、<ruby>強<rt>つよ</rt></ruby>いものの<ruby>権力<rt>けんりょく</rt></ruby>を<ruby>盾<rt>たて</rt></ruby>にして<ruby>威張<rt>いば</rt></ruby>ること。", example: "「いばっているあの子も、<ruby>強<rt>つよ</rt></ruby>い<ruby>先輩<rt>せんぱい</rt></ruby>がいなくなると<ruby>何<rt>なに</rt></ruby>も<ruby>言<rt>い</rt></ruby>えない。<ruby>虎<rt>とら</rt></ruby>の<ruby>威<rt>い</rt></ruby>を<ruby>借<rt>か</rt></ruby>る<ruby>狐<rt>きつね</rt></ruby>だ。」" },
+            { id: 7, cat: "生き物・動物", kotowaza: "<ruby>月<rt>つき</rt></ruby>とすっぽん", plain: "月とすっぽん", meaning: "<ruby>見<rt>み</rt></ruby>ためは<ruby>似<rt>に</rt></ruby>ていても、<ruby>比<rt>くら</rt></ruby>べものにならないほど<ruby>違<rt>ちが</rt></ruby>いが<ruby>大<rt>おお</rt></ruby>きいこと。", example: "「<ruby>丸<rt>まる</rt></ruby>い<ruby>形<rt>かたち</rt></ruby>は<ruby>似<rt>に</rt></ruby>ているけれど、<ruby>実力<rt>じつりょく</rt></ruby>は<ruby>月<rt>つき</rt></ruby>とすっぽんだ。」" },
+            { id: 8, cat: "生き物・動物", kotowaza: "<ruby>馬<rt>うま</rt></ruby>の<ruby>耳<rt>みみ</rt></ruby>に<ruby>念仏<rt>ねんぶつ</rt></ruby>", plain: "馬の耳に念仏", meaning: "いくら<ruby>意見<rt>いけん</rt></ruby>や<ruby>忠告<rt>ちゅうこく</rt></ruby>を<ruby>聞<rt>き</rt></ruby>かせても、<ruby>全<rt>まった</rt></ruby>く<ruby>効<rt>き</rt></ruby>き<ruby>目<rt>め</rt></ruby>がないこと。", example: "「いくら<ruby>勉強<rt>べんきょう</rt></ruby>しなさいと<ruby>言<rt>い</rt></ruby>っても<ruby>聞<rt>き</rt></ruby>かないなんて、<ruby>馬<rt>うま</rt></ruby>の<ruby>耳<rt>みみ</rt></ruby>に<ruby>念仏<rt>ねんぶつ</rt></ruby>だね。」" },
+            { id: 9, cat: "生き物・動物", kotowaza: "<ruby>猿<rt>さる</rt></ruby>も<ruby>木<rt>き</rt></ruby>から<ruby>落<rt>お</rt></ruby>ちる", plain: "猿も木から落ちる", meaning: "その<ruby>道<rt>みち</rt></ruby>の<ruby>名人<rt>めいじん</rt></ruby>や<ruby>上手<rt>じょうず</rt></ruby>な<ruby>人<rt>ひと</rt></ruby>でも、ときには<ruby>失敗<rt>しっぱい</rt></ruby>することがあること。", example: "「<ruby>水泳<rt>すいえい</rt></ruby><ruby>名人<rt>めいじん</rt></ruby>のたなか<ruby>君<rt>くん</rt></ruby>でも<ruby>失敗<rt>しっぱい</rt></ruby>することがある、まさに<ruby>猿<rt>さる</rt></ruby>も<ruby>木<rt>き</rt></ruby>から<ruby>落<rt>お</rt></ruby>ちるだ。」" },
+            { id: 10, cat: "生き物・動物", kotowaza: "<ruby>蛙<rt>かえる</rt></ruby>の<ruby>面<rt>つら</rt></ruby>に<ruby>水<rt>みず</rt></ruby>", plain: "蛙の面に水", meaning: "どんなことをされても<ruby>全<rt>まった</rt></ruby>く<ruby>気<rt>き</rt></ruby>にせず、<ruby>平気<rt>へいき</rt></ruby>でいること。", example: "「どんなに<ruby>注意<rt>ちゅうい</rt></ruby>されても<ruby>平然<rt>へいぜん</rt></ruby>としているなんて、<ruby>蛙<rt>かえる</rt></ruby>の<ruby>面<rt>つら</rt></ruby>に<ruby>水<rt>みず</rt></ruby>だね。」" },
+            { id: 11, cat: "生き物・動物", kotowaza: "あぶはち<ruby>取<rt>と</rt></ruby>らず", plain: "あぶはち取らず", meaning: "<ruby>欲張<rt>よくば</rt></ruby>って<ruby>二<rt>ふた</rt></ruby>つのものを<ruby>同時<rt>どうじ</rt></ruby>に<ruby>得<rt>え</rt></ruby>ようとして、<ruby>結局<rt>けっきょく</rt></ruby>どちらも<ruby>失敗<rt>しっぱい</rt></ruby>すること。", example: "「ゲームも<ruby>宿題<rt>しゅくだい</rt></ruby>も<ruby>中途半端<rt>ちゅうとはんぱ</rt></ruby>になってあぶはち<ruby>取<rt>と</rt></ruby>らずにならないようにしよう。」" },
+            { id: 12, cat: "生き物・動物", kotowaza: "<ruby>泣<rt>な</rt></ruby>きっ<ruby>面<rt>つら</rt></ruby>に<ruby>蜂<rt>はち</rt></ruby>", plain: "泣きっ面に蜂", meaning: "<ruby>困<rt>こま</rt></ruby>っているところに、さらに<ruby>不幸<rt>ふこう</rt></ruby>や<ruby>不運<rt>ふうん</rt></ruby>が<ruby>重<rt>かさ</rt></ruby>なること。", example: "「<ruby>転<rt>ころ</rt></ruby>んで<ruby>痛<rt>いた</rt></ruby>い<ruby>思<rt>おも</rt></ruby>いをした<ruby>上<rt>うえ</rt></ruby>に<ruby>雨<rt>あめ</rt></ruby>まで<ruby>降<rt>ふ</rt></ruby>ってくるなんて、<ruby>泣<rt>な</rt></ruby>きっ<ruby>面<rt>つら</rt></ruby>に<ruby>蜂<rt>はち</rt></ruby>だ。」" },
+            { id: 13, cat: "生き物・動物", kotowaza: "<ruby>蛇足<rt>だそく</rt></ruby>", plain: "蛇足", meaning: "あっても<ruby>意味<rt>いみ</rt></ruby>がなく、かえって<ruby>邪魔<rt>じゃま</rt></ruby>になる<ruby>余計<rt>よけい</rt></ruby>なつけ<ruby>足<rt>た</rt></ruby>しのこと。", example: "「<ruby>完成<rt>かんせい</rt></ruby>した<ruby>絵<rt>え</rt></ruby>に<ruby>余計<rt>よけい</rt></ruby>な<ruby>線<rt>せん</rt></ruby>をかき<ruby>加<rt>くわ</rt></ruby>えてしまい、<ruby>蛇足<rt>だそく</rt></ruby>になってしまった。」" },
+            { id: 14, cat: "生き物・動物", kotowaza: "<ruby>立<rt>た</rt></ruby>つ<ruby>鳥<rt>とり</rt></ruby>あとを<ruby>濁<rt>にご</rt></ruby>さず", plain: "立つ鳥あとを濁さず", meaning: "<ruby>立<rt>た</rt></ruby>ち<ruby>去<rt>さ</rt></ruby>るときは、<ruby>最後<rt>さいご</rt></ruby>まできれいに<ruby>後始末<rt>あとしまつ</rt></ruby>をしておくべきだということ。", example: "「<ruby>使<rt>つか</rt></ruby>った<ruby>教室<rt>きょうしつ</rt></ruby>はきれいにそうじしてから<ruby>帰<rt>かえ</rt></ruby>ろう。<ruby>立<rt>た</rt></ruby>つ<ruby>鳥<rt>とり</rt></ruby>あとを<ruby>濁<rt>にご</rt></ruby>さずだ。」" },
+            { id: 15, cat: "生き物・動物", kotowaza: "とんびが<ruby>鷹<rt>たか</rt></ruby>を<ruby>生<rt>う</rt></ruby>む", plain: "とんびが鷹を生む", meaning: "ごく<ruby>平凡<rt>へいぼん</rt></ruby>な<ruby>親<rt>おや</rt></ruby>から、<ruby>非常<rt>ひじょう</rt></ruby>に<ruby>優秀<rt>ゆうしゅう</rt></ruby>な<ruby>子供<rt>こども</rt></ruby>が<ruby>生<rt>うま</rt></ruby>まれること。", example: "「<ruby>運動<rt>うんどう</rt></ruby>が<ruby>苦手<rt>にがて</rt></ruby>な<ruby>両親<rt>りょうしん</rt></ruby>からオリンピック<ruby>選手<rt>せんしゅ</rt></ruby>が<ruby>生<rt>うま</rt></ruby>まれるなんて、とんびが<ruby>鷹<rt>たか</rt></ruby>を<ruby>生<rt>う</rt></ruby>むだね。」" },
+
+            // 【2. 数字・数量のことわざ】
+            { id: 16, cat: "数字・数量", kotowaza: "<ruby>石<rt>いし</rt></ruby>の<ruby>上<rt>うえ</rt></ruby>にも<ruby>三年<rt>さんねん</rt></ruby>", plain: "石の上にも三年", meaning: "<ruby>辛<rt>つら</rt></ruby>くても<ruby>諦<rt>あきら</rt></ruby>めずに<ruby>続<rt>つづ</rt></ruby>けていれば<ruby>成果<rt>せいか</rt></ruby>が<ruby>出<rt>で</rt></ruby>ること。", example: "「ニガテなピアノも<ruby>毎日<rt>まいにち</rt></ruby>れんしゅうしたら<ruby>上手<rt>じょうず</rt></ruby>になった！<ruby>石<rt>いし</rt></ruby>の<ruby>上<rt>うえ</rt></ruby>にも<ruby>三年<rt>さんねん</rt></ruby>だね。」" },
+            { id: 17, cat: "数字・数量", kotowaza: "<ruby>三人<rt>さんにん</rt></ruby><ruby>寄<rt>よ</rt></ruby>れば<ruby>文殊<rt>もんじゅ</rt></ruby>の<ruby>知恵<rt>ちえ</rt></ruby>", plain: "三人寄れば文殊の知恵", meaning: "<ruby>普通<rt>ふつう</rt></ruby>の<ruby>人<rt>ひと</rt></ruby>でも<ruby>三人<rt>さんにん</rt></ruby><ruby>集<rt>あつ</rt></ruby>まって<ruby>相談<rt>そうだん</rt></ruby>すれば<ruby>良<rt>よ</rt></ruby>い<ruby>知恵<rt>ちえ</rt></ruby>が<ruby>出<rt>で</rt></ruby>るということ。", example: "「<ruby>難解<rt>なんかい</rt></ruby>となぞなぞも<ruby>班<rt>はん</rt></ruby>のみんなで<ruby>考<rt>かんが</rt></ruby>えたら<ruby>解<rt>と</rt></ruby>けた！<ruby>三人<rt>さんにん</rt></ruby><ruby>寄<rt>よ</rt></ruby>れば<ruby>文殊<rt>もんじゅ</rt></ruby>の<ruby>知恵<rt>ちえ</rt></ruby>だ。」" },
+            { id: 18, cat: "数字・数量", kotowaza: "<ruby>二兎<rt>にと</rt></ruby>を<ruby>追<rt>お</rt></ruby>う<ruby>者<rt>もの</rt></ruby>は<ruby>一兎<rt>いっと</rt></ruby>をも<ruby>得<rt>え</rt></ruby>ず", plain: "二兎を追う者は一兎をも得ず", meaning: "<ruby>欲張<rt>よくば</rt></ruby>って<ruby>同時<rt>どうじ</rt></ruby>に<ruby>二<rt>ふた</rt></ruby>つの<ruby>目標<rt>もくひょう</rt></ruby>を<ruby>追<rt>お</rt></ruby>うと、<ruby>両方<rt>りょうほう</rt></ruby>とも<ruby>失敗<rt>しっぱい</rt></ruby>すること。", example: "「<ruby>両方<rt>りょうほう</rt></ruby><ruby>手<rt>て</rt></ruby>に<ruby>入<rt>い</rt></ruby>れようとして<ruby>全滅<rt>ぜんめつ</rt></ruby>した。<ruby>二兎<rt>にと</rt></ruby>を<ruby>追<rt>お</rt></ruby>う<ruby>者<rt>もの</rt></ruby>は<ruby>一兎<rt>いっと</rt></ruby>をも<ruby>得<rt>え</rt></ruby>ずだ。」" },
+            { id: 19, cat: "数字・数量", kotowaza: "<ruby>一寸<rt>いっすん</rt></ruby><ruby>先<rt>さき</rt></ruby>は<ruby>闇<rt>やみ</rt></ruby>", plain: "一寸先は闇", meaning: "ほんの<ruby>少<rt>すこ</rt></ruby>し<ruby>先<rt>さき</rt></ruby>の<ruby>将来<rt>しょうらい</rt></ruby>のこともどうなるか<ruby>分<rt>わ</rt></ruby>からないこと。", example: "「<ruby>勝<rt>か</rt></ruby>っていた<ruby>試合<rt>しあい</rt></ruby>で<ruby>最後<rt>さいご</rt></ruby>に<ruby>逆転<rt>ぎゃくてん</rt></ruby>されるなんて、<ruby>一寸<rt>いっすん</rt></ruby><ruby>先<rt>さき</rt></ruby>は<ruby>闇<rt>やみ</rt></ruby>だね。」" },
+            { id: 20, cat: "数字・数量", kotowaza: "<ruby>一寸<rt>いっすん</rt></ruby>の<ruby>虫<rt>むし</rt></ruby>にも<ruby>五分<rt>ごぶ</rt></ruby>の<ruby>魂<rt>たましい</rt></ruby>", plain: "一寸の虫にも五分の魂", meaning: "<ruby>小<rt>ちい</rt></ruby>さく<ruby>弱<rt>よわ</rt></ruby>い<ruby>者<rt>もの</rt></ruby>にも<ruby>意地<rt>いじ</rt></ruby>があるから<ruby>侮<rt>あなど</rt></ruby>ってはならないこと。", example: "「<ruby>体<rt>からだ</rt></ruby>が<ruby>小<rt>ちい</rt></ruby>さくても<ruby>負<rt>ま</rt></ruby>けん<ruby>気<rt>き</rt></ruby>は<ruby>強<rt>つよ</rt></ruby>いぞ。<ruby>一寸<rt>いっすん</rt></ruby>の<ruby>虫<rt>むし</rt></ruby>にも<ruby>五分<rt>ごぶ</rt></ruby>の<ruby>魂<rt>たましい</rt></ruby>だ！」" },
+            { id: 21, cat: "数字・数量", kotowaza: "<ruby>三つ子<rt>みつご</rt></ruby>の<ruby>魂<rt>たましい</rt></ruby><ruby>百<rt>ひゃく</rt></ruby>まで", plain: "三つ子の魂百まで", meaning: "<ruby>幼<rt>おさな</rt></ruby>い<ruby>頃<rt>ころ</rt></ruby>の<ruby>気質<rt>きしつ</rt></ruby>は<ruby>年<rt>とし</rt></ruby>をとっても<ruby>変<rt>か</rt></ruby>わらないこと。", example: "「<ruby>小<rt>ちい</rt></ruby>さい<ruby>頃<rt>ころ</rt></ruby>からのきれい<ruby>好<rt>す</rt></ruby>きは<ruby>大人<rt>おとな</rt></ruby>になってもそのまま。<ruby>三つ子<rt>みつご</rt></ruby>の<ruby>魂<rt>たましい</rt></ruby><ruby>百<rt>ひゃく</rt></ruby>までだ。」" },
+            { id: 22, cat: "数字・数量", kotowaza: "<ruby>七転<rt>ななころ</rt></ruby>び<ruby>八起<rt>やお</rt></ruby>き", plain: "七転び八起き", meaning: "<ruby>何度<rt>なんど</rt></ruby><ruby>失敗<rt>しっぱい</rt></ruby>しても<ruby>諦<rt>あきら</rt></ruby>めずに<ruby>立<rt>た</rt></ruby>ち<ruby>上<rt>あ</rt></ruby>がること。", example: "「なんかいころんでもあきらめない！<ruby>七転<rt>ななころ</rt></ruby>び<ruby>八起<rt>やお</rt></ruby>きの<ruby>精神<rt>せいしん</rt></ruby>だ！」" },
+            { id: 23, cat: "数字・数量", kotowaza: "<ruby>百聞<rt>ひゃくぶん</rt></ruby>は<ruby>一見<rt>いっけん</rt></ruby>にしかず", plain: "百聞は一見にしかず", meaning: "<ruby>何度<rt>なんど</rt></ruby>も<ruby>聞<rt>き</rt></ruby>くより<ruby>自分<rt>じぶん</rt></ruby>の<ruby>目<rt>め</rt></ruby>で<ruby>一回<rt>いっかい</rt></ruby><ruby>確<rt>たしか</rt></ruby>める<ruby>方<rt>ほう</rt></ruby>が<ruby>理解<rt>りかい</rt></ruby>できること。", example: "「<ruby>写真<rt>しゃしん</rt></ruby>で<ruby>見<rt>み</rt></ruby>るより<ruby>実際<rt>じっさい</rt></ruby>に<ruby>見<rt>み</rt></ruby>た<ruby>方<rt>ほう</rt></ruby>がすごかった。<ruby>百聞<rt>ひゃくぶん</rt></ruby>は<ruby>一見<rt>いっけん</rt></ruby>にしかずだ。」" },
+            { id: 24, cat: "数字・数量", kotowaza: "<ruby>一<rt>いち</rt></ruby>を聞いて<ruby>十<rt>じゅう</rt></ruby>を知る", plain: "一を聞いて十を知る", meaning: "<ruby>一部<rt>いちぶ</rt></ruby>を<ruby>聞<rt>き</rt></ruby>いただけで<ruby>全体<rt>ぜんたい</rt></ruby>を<ruby>理解<rt>りかい</rt></ruby>できるほど<ruby>賢<rt>かしこ</rt></ruby>いこと。", example: "「<ruby>良<rt>すこ</rt></ruby>し<ruby>説明<rt>せつめい</rt></ruby>しただけで<ruby>全部<rt>ぜんぶ</rt></ruby><ruby>理解<rt>りかい</rt></ruby>しちゃった！<ruby>一<rt>いち</rt></ruby>を<ruby>聞<rt>き</rt></ruby>いて<ruby>十<rt>じゅう</rt></ruby>を<ruby>知<rt>し</rt></ruby>る<ruby>人<rt>ひと</rt></ruby>だね。」" },
+            { id: 25, cat: "数字・数量", kotowaza: "<ruby>千里<rt>せんり</rt></ruby>の<ruby>道<rt>みち</rt></ruby>も<ruby>一歩<rt>いっぽ</rt></ruby>から", plain: "千里の道も一歩から", meaning: "<ruby>大<rt>おお</rt></ruby>きな<ruby>目標<rt>もくひょう</rt></ruby>も<ruby>身近<rt>みぢか</rt></ruby>な<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>一歩<rt>いっぽ</rt></ruby>から<ruby>始<rt>はじ</rt></ruby>まること。", example: "「<ruby>漢字<rt>かんじ</rt></ruby>100<ruby>個<rt>こ</rt></ruby>の<ruby>暗記<rt>あんき</rt></ruby>も、<ruby>今日<rt>きょう</rt></ruby>1<ruby>個<rt>こ</rt></ruby><ruby>覚<rt>おぼ</rt></ruby>えることから<ruby>始<rt>はじ</rt></ruby>まる。<ruby>千里<rt>せんり</rt></ruby>の<ruby>道<rt>みち</rt></ruby>も<ruby>一歩<rt>いっぽ</rt></ruby>から！」" },
+            { id: 26, cat: "数字・数量", kotowaza: "<ruby>九死<rt>きゅうし</rt></ruby>に<ruby>一生<rt>いっしょう</rt></ruby>を<ruby>得<rt>え</rt></ruby>る", plain: "九死に一生を得る", meaning: "<ruby>絶体絶命<rt>ぜったいぜつめい</rt></ruby>の<ruby>危険<rt>きけん</rt></ruby>から<ruby>奇跡的<rt>きせきてき</rt></ruby>に<ruby>助<rt>たす</rt></ruby>かること。", example: "「<ruby>大<rt>だい</rt></ruby>ピンチだったけれど<ruby>奇跡的<rt>きせきてき</rt></ruby>に<ruby>助<rt>たす</rt></ruby>かった。まさに<ruby>九死<rt>きゅうし</rt></ruby>に<ruby>一生<rt>いっしょう</rt></ruby>を<ruby>得<rt>え</rt></ruby>るだ。」" },
+            { id: 27, cat: "数字・数量", kotowaza: "<ruby>桃栗<rt>ももくり</rt></ruby><ruby>三年<rt>さんねん</rt></ruby><ruby>柿<rt>かき</rt></ruby><ruby>八年<rt>はちねん</rt></ruby>", plain: "桃栗三年柿八年", meaning: "<ruby>成果<rt>せいか</rt></ruby>が<ruby>出<rt>で</rt></ruby>るまでにはそれなりの<ruby>時間<rt>じかん</rt></ruby>がかかること。", example: "「すぐに<ruby>結果<rt>けっか</rt></ruby>が<ruby>出<rt>で</rt></ruby>なくても<ruby>焦<rt>あせ</rt></ruby>らずに<ruby>練習<rt>れんしゅう</rt></ruby>しよう。<ruby>桃栗<rt>ももくり</rt></ruby><ruby>三年<rt>さんねん</rt></ruby><ruby>柿<rt>かき</rt></ruby><ruby>八年<rt>はちねん</rt></ruby>だよ。」" },
+            { id: 28, cat: "数字・数量", kotowaza: "<ruby>悪事<rt>あくじ</rt></ruby><ruby>千里<rt>せんり</rt></ruby>を<ruby>走<rt>はし</rt></ruby>る", plain: "悪事千里を走る", meaning: "<ruby>悪<rt>わる</rt></ruby>い<ruby>行<rt>おこな</rt></ruby>いやうわさはあっという<ruby>間<rt>ま</rt></ruby>に<ruby>世間<rt>せけん</rt></ruby>に<ruby>広<rt>ひろ</rt></ruby>まること。", example: "「いたずらしたことがすぐにクラス<ruby>全員<rt>ぜんいん</rt></ruby>に<ruby>知<rt>し</rt></ruby>れ<ruby>渡<rt>わた</rt></ruby>った。<ruby>悪事<rt>あくじ</rt></ruby><ruby>千里<rt>せんり</rt></ruby>を<ruby>走<rt>はし</rt></ruby>るだ。」" },
+
+            // 【3. 努力・学習・習慣のことわざ】
+            { id: 29, cat: "努力・学習", kotowaza: "<ruby>継続<rt>けいぞく</rt></ruby>は<ruby>力<rt>ちから</rt></ruby>なり", plain: "継続は力なり", meaning: "<ruby>毎日<rt>まいにち</rt></ruby>コツコツ<ruby>続<rt>つづ</rt></ruby>けることが<ruby>大<rt>おお</rt></ruby>きな<ruby>力<rt>ちから</rt></ruby>になること。", example: "「<ruby>毎日<rt>まいにち</rt></ruby>5<ruby>分<rt>ふん</rt></ruby><ruby>計算<rt>けいさん</rt></ruby>ドリルをやったら100<ruby>点<rt>てん</rt></ruby>が<ruby>取<rt>と</rt></ruby>れた！<ruby>継続<rt>けいぞく</rt></ruby>は<ruby>力<rt>ちから</rt></ruby>なりだね。」" },
+            { id: 30, cat: "努力・学習", kotowaza: "<ruby>塵<rt>ちり</rt></ruby>も<ruby>積<rt>つ</rt></ruby>もれば<ruby>山<rt>やま</rt></ruby>となる", plain: "塵も積もれば山となる", meaning: "ごくわずかなものでも<ruby>積<rt>つ</rt></ruby>み<ruby>重<rt>かさ</rt></ruby>ねれば<ruby>大<rt>おお</rt></ruby>きくなること。", example: "「<ruby>毎日<rt>まいにち</rt></ruby>のお<ruby>小遣<rt>こづか</rt></ruby>いをコツコツ<ruby>貯<rt>た</rt></ruby>めたらゲームが<ruby>買<rt>か</rt></ruby>えた！<ruby>塵<rt>ちり</rt></ruby>も<ruby>積<rt>つ</rt></ruby>もれば<ruby>山<rt>やま</rt></ruby>となるだ。」" },
+            { id: 31, cat: "努力・学習", kotowaza: "<ruby>習<rt>なら</rt></ruby>うより<ruby>慣<rt>な</rt></ruby>れよ", plain: "習うより慣れよ", meaning: "<ruby>教<rt>おし</rt></ruby>わるよりも<ruby>実際<rt>じっさい</rt></ruby>に<ruby>繰<rt>く</rt></ruby>り返して<ruby>体験<rt>たいけん</rt></ruby>する<ruby>方<rt>ほう</rt></ruby>が<ruby>身<rt>み</rt></ruby>につくこと。", example: "「<ruby>説明書<rt>せつめいしょ</rt></ruby>を<ruby>読<rt>よ</rt></ruby>むより<ruby>自分<rt>じぶん</rt></ruby>で<ruby>遊<rt>あそ</rt></ruby>んで<ruby>覚<rt>おぼ</rt></ruby>える<ruby>方<rt>ほう</rt></ruby>が<ruby>早<rt>はや</rt></ruby>いね。<ruby>習<rt>なら</rt></ruby>うより<ruby>慣<rt>な</rt></ruby>れよだ。」" },
+            { id: 32, cat: "努力・学習", kotowaza: "<ruby>雨<rt>あめ</rt></ruby>だれ<ruby>石<rt>いし</rt></ruby>を<ruby>穿<rt>うが</rt></ruby>つ", plain: "雨だれ石を穿つ", meaning: "<ruby>小<rt>ちい</rt></ruby>さな<ruby>努力<rt>どりょく</rt></ruby>でも<ruby>根気<rt>こんき</rt></ruby>よく<ruby>続<rt>つづ</rt></ruby>ければ<ruby>大<rt>おお</rt></ruby>きな<ruby>目的<rt>もくてき</rt></ruby>を<ruby>達成<rt>たっせい</rt></ruby>できること。", example: "「<ruby>地道<rt>じみち</rt></ruby>な<ruby>努力<rt>どりょく</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けた<ruby>結果<rt>けっか</rt></ruby>、<ruby>不可能<rt>ふかのう</rt></ruby>な<ruby>目標<rt>もくひょう</rt></ruby>を<ruby>達成<rt>たっせい</rt></ruby>できた。<ruby>雨<rt>あめ</rt></ruby>だれ<ruby>石<rt>いし</rt></ruby>を<ruby>穿<rt>うが</rt></ruby>つだ。」" },
+            { id: 33, cat: "努力・学習", kotowaza: "<ruby>失敗<rt>しっぱい</rt></ruby>は<ruby>成功<rt>せいこう</rt></ruby>のもと", plain: "失敗は成功のもと", meaning: "<ruby>失敗<rt>しっぱい</rt></ruby>の<ruby>原因<rt>げんいん</rt></ruby>を<ruby>反省<rt>はんせい</rt></ruby>して<ruby>直<rt>なお</rt></ruby>せば<ruby>次<rt>つぎ</rt></ruby>の<ruby>成功<rt>せいこう</rt></ruby>につながること。", example: "「まちがえた<ruby>問題<rt>もんだい</rt></ruby>をやり<ruby>直<rt>なお</rt></ruby>して<ruby>次<rt>つぎ</rt></ruby>は100<ruby>点<rt>てん</rt></ruby>！<ruby>失敗<rt>しっぱい</rt></ruby>は<ruby>成功<rt>せいこう</rt></ruby>のもとだね。」" },
+            { id: 34, cat: "努力・学習", kotowaza: "<ruby>聞<rt>き</rt></ruby>くは<ruby>一時<rt>いっとき</rt></ruby>の<ruby>恥<rt>はじ</rt></ruby><ruby>聞<rt>き</rt></ruby>かぬは<ruby>一生<rt>いっしょう</rt></ruby>の<ruby>恥<rt>はじ</rt></ruby>", plain: "聞くは一時の恥聞かぬは一生の恥", meaning: "<ruby>分<rt>わ</rt></ruby>からないことを<ruby>聞<rt>き</rt></ruby>くのは<ruby>一瞬<rt>いっしゅん</rt></ruby><ruby>恥<rt>はず</rt></ruby>かしいが、<ruby>放置<rt>ほうち</rt></ruby>すると<ruby>一生<rt>いっしょう</rt></ruby><ruby>恥<rt>はじ</rt></ruby>をかくこと。", example: "「<ruby>先生<rt>せんせい</rt></ruby>に<ruby>思<rt>おも</rt></ruby>い<ruby>切<rt>き</rt></ruby>って<ruby>質問<rt>しつもん</rt></ruby>してよかった！<ruby>聞<rt>き</rt></ruby>くは<ruby>一時<rt>いっとき</rt></ruby>の<ruby>恥<rt>はじ</rt></ruby><ruby>聞<rt>き</rt></ruby>かぬは<ruby>一生<rt>いっしょう</rt></ruby>の<ruby>恥<rt>はじ</rt></ruby>だ。」" },
+            { id: 35, cat: "努力・学習", kotowaza: "<ruby>思<rt>おも</rt></ruby>い<ruby>立<rt>た</rt></ruby>ったが<ruby>吉日<rt>きちじつ</rt></ruby>", plain: "思い立ったが吉日", meaning: "やろうと<ruby>思<rt>おも</rt></ruby>ったその<ruby>日<rt>ひ</rt></ruby>を<ruby>吉日<rt>きちじつ</rt></ruby>としてすぐ<ruby>始<rt>はじ</rt></ruby>めるのが<ruby>良<rt>よ</rt></ruby>いこと。", example: "「<ruby>部屋<rt>へや</rt></ruby>のそうじ、<ruby>明日<rt>あした</rt></ruby>じゃなくて<ruby>今<rt>いま</rt></ruby>やろう！<ruby>思<rt>おも</rt></ruby>い<ruby>立<rt>た</rt></ruby>ったが<ruby>吉日<rt>きちじつ</rt></ruby>だ！」" },
+            { id: 36, cat: "努力・学習", kotowaza: "<ruby>初心<rt>しょしん</rt></ruby><ruby>忘<rt>わす</rt></ruby>るべからず", plain: "初心忘るべからず", meaning: "<ruby>最初<rt>さいしょ</rt></ruby>に<ruby>物事<rt>ものごと</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>めたときの<ruby>情熱<rt>じょうねつ</rt></ruby>や<ruby>謙虚<rt>けんきょ</rt></ruby>さを<ruby>忘<rt>わす</rt></ruby>れてはならないこと。", example: "「<ruby>慣<rt>な</rt></ruby>れてきた<ruby>時<rt>とき</rt></ruby>こそ<ruby>気<rt>き</rt></ruby>を<ruby>引<rt>ひ</rt></ruby>き<ruby>締<rt>し</rt></ruby>めよう。<ruby>初心<rt>しょしん</rt></ruby><ruby>忘<rt>わす</rt></ruby>るべからずだよ。」" },
+            { id: 37, cat: "努力・学習", kotowaza: "<ruby>好<rt>す</rt></ruby>きこそ<ruby>物<rt>もの</rt></ruby>の<ruby>上手<rt>じょうず</rt></ruby>なれ", plain: "好きこそ物の上手なれ", meaning: "<ruby>好<rt>す</rt></ruby>きなことには<ruby>自然<rt>しぜん</rt></ruby>と<ruby>熱心<rt>ねっしん</rt></ruby>に<ruby>取<rt>と</rt></ruby>り<ruby>組<rt>く</rt></ruby>むので<ruby>上達<rt>じょうたつ</rt></ruby>が<ruby>早<rt>はや</rt></ruby>いこと。", example: "「<ruby>絵<rt>え</rt></ruby>を<ruby>描<rt>か</rt></ruby>くのが<ruby>大好<rt>だいす</rt></ruby>きだからぐんぐん<ruby>上達<rt>じょうたつ</rt></ruby>するね。<ruby>好<rt>す</rt></ruby>きこそ<ruby>物<rt>もの</rt></ruby>の<ruby>上手<rt>じょうず</rt></ruby>なれだ。」" },
+            { id: 38, cat: "努力・学習", kotowaza: "<ruby>早起<rt>はやお</rt></ruby>きは<ruby>三文<rt>さんもん</rt></ruby>の<ruby>徳<rt>とく</rt></ruby>", plain: "早起きは三文の徳", meaning: "<ruby>朝<rt>あさ</rt></ruby><ruby>早<rt>はや</rt></ruby>く<ruby>起<rt>お</rt></ruby>きると<ruby>何<rt>なに</rt></ruby>かと<ruby>良<rt>よ</rt></ruby>いことがあること。", example: "「<ruby>早起<rt>はやお</rt></ruby>きしたら<ruby>素晴<rt>すば</rt></ruby>らしい<ruby>朝<rt>あさ</rt></ruby>やけが<ruby>見<rt>み</rt></ruby>られたよ。<ruby>早起<rt>はやお</rt></ruby>きは<ruby>三文<rt>さんもん</rt></ruby>の<ruby>徳<rt>とく</rt></ruby>だね。」" },
+
+            // 【4. 友達・人間関係のことわざ】
+            { id: 39, cat: "友達・人間関係", kotowaza: "<ruby>親<rt>した</rt></ruby>しき<ruby>仲<rt>なか</rt></ruby>にも<ruby>礼儀<rt>れいぎ</rt></ruby>あり", plain: "親しき仲にも礼儀あり", meaning: "どんなに<ruby>仲<rt>なか</rt></ruby>が<ruby>良<rt>よ</rt></ruby>くても<ruby>最低限<rt>さいていげん</rt></ruby>の<ruby>節度<rt>せつど</rt></ruby>や<ruby>礼儀<rt>れいぎ</rt></ruby>を<ruby>守<rt>まも</rt></ruby>るべきであること。", example: "「<ruby>大親友<rt>だいしんゆう</rt></ruby>の<ruby>家<rt>いえ</rt></ruby>でも<ruby>勝手<rt>かって</rt></ruby>に<ruby>冷蔵庫<rt>れいぞうこ</rt></ruby>を<ruby>開<rt>あ</rt></ruby>けちゃダメ。<ruby>親<rt>した</rt></ruby>しき<ruby>仲<rt>なか</rt></ruby>にも<ruby>礼儀<rt>れいぎ</rt></ruby>ありだよ。」" },
+            { id: 40, cat: "友達・人間関係", kotowaza: "<ruby>類<rt>るい</rt></ruby>は<ruby>友<rt>とも</rt></ruby>を<ruby>呼<rt>よ</rt></ruby>ぶ", plain: "類は友を呼ぶ", meaning: "<ruby>似<rt>に</rt></ruby>た<ruby>者<rt>もの</rt></ruby><ruby>同士<rt>どうし</rt></ruby>や<ruby>気<rt>き</rt></ruby>が<ruby>合<rt>あ</rt></ruby>う<ruby>者<rt>もの</rt></ruby>は<ruby>自然<rt>しぜん</rt></ruby>と<ruby>集<rt>あつ</rt></ruby>まること。", example: "「サッカー<ruby>好<rt>す</rt></ruby>きの<ruby>周<rt>まわ</rt></ruby>りには<ruby>自然<rt>しぜん</rt></ruby>とサッカー<ruby>好<rt>す</rt></ruby>きが<ruby>集<rt>あつ</rt></ruby>まる。<ruby>類<rt>るい</rt></ruby>は<ruby>友<rt>とも</rt></ruby>を<ruby>呼<rt>よ</rt></ruby>ぶだね。」" },
+            { id: 41, cat: "友達・人間関係", kotowaza: "<ruby>情<rt>なさ</rt></ruby>けは<ruby>人<rt>ひと</rt></ruby>のためならず", plain: "情けは人のためならず", meaning: "<ruby>人<rt>ひと</rt></ruby>に<ruby>親切<rt>しんせつ</rt></ruby>にすると<ruby>巡<rt>めぐ</rt></ruby>り<ruby>巡<rt>めぐ</rt></ruby>って<ruby>自分<rt>じぶん</rt></ruby>に<ruby>良<rt>よ</rt></ruby>い<ruby>報<rt>むく</rt></ruby>いがくること。", example: "「<ruby>友達<rt>ともだち</rt></ruby>を<ruby>助<rt>たす</rt></ruby>けたら<ruby>後<rt>あと</rt></ruby>で<ruby>別<rt>べつ</rt></ruby>の<ruby>友達<rt>ともだち</rt></ruby>に<ruby>助<rt>たす</rt></ruby>けられた。<ruby>情<rt>なさ</rt></ruby>けは<ruby>人<rt>ひと</rt></ruby>のためならずだ。」" },
+            { id: 42, cat: "友達・人間関係", kotowaza: "<ruby>人<rt>ひと</rt></ruby>のふり<ruby>見<rt>み</rt></ruby>て<ruby>我<rt>わ</rt></ruby>がふり<ruby>直<rt>なお</rt></ruby>せ", plain: "人のふり見て我がふり直せ", meaning: "<ruby>他人<rt>たにん</rt></ruby>の<ruby>行<rt>おこな</rt></ruby>いを<ruby>見<rt>み</rt></ruby>て<ruby>自分<rt>じぶん</rt></ruby>の<ruby>行動<rt>こうどう</rt></ruby>を<ruby>振<rt>ふ</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>り<ruby>修正<rt>しゅうせい</rt></ruby>すること。", example: "「<ruby>友達<rt>ともだち</rt></ruby>の<ruby>態度<rt>たいど</rt></ruby>を<ruby>見<rt>み</rt></ruby>て<ruby>自分<rt>じぶん</rt></ruby>の<ruby>行<rt>おこな</rt></ruby>いを<ruby>反省<rt>はんせい</rt></ruby>したよ。<ruby>人<rt>ひと</rt></ruby>のふり<ruby>見<rt>み</rt></ruby>て<ruby>我<rt>わ</rt></ruby>がふり<ruby>直<rt>なお</rt></ruby>せだ。」" },
+            { id: 43, cat: "友達・人間関係", kotowaza: "<ruby>口<rt>くち</rt></ruby>は<ruby>災<rt>わざわ</rt></ruby>いの<ruby>元<rt>もと</rt></ruby>", plain: "口は災いの元", meaning: "<ruby>不用意<rt>ふようい</rt></ruby>な<ruby>言葉<rt>ことば</rt></ruby>が<ruby>自分自身<rt>じぶんじしん</rt></ruby>にトラブルを<ruby>招<rt>まね</rt></ruby>くこと。", example: "「うっかり<ruby>余計<rt>よけい</rt></ruby>なことを<ruby>言<rt>い</rt></ruby>って<ruby>怒<rt>おこ</rt></ruby>られた。<ruby>口<rt>くち</rt></ruby>は<ruby>災<rt>わざわ</rt></ruby>いの<ruby>元<rt>もと</rt></ruby>だから<ruby>気<rt>き</rt></ruby>をつけよう。」" },
+            { id: 44, cat: "友達・人間関係", kotowaza: "<ruby>持<rt>も</rt></ruby>ちつ<ruby>持<rt>も</rt></ruby>たれつ", plain: "持ちつ持たれつ", meaning: "<ruby>人間関係<rt>にんげんかんけい</rt></ruby>はお<ruby>互<rt>たが</rt></ruby>いに<ruby>助<rt>たす</rt></ruby>け<ruby>合<rt>あ</rt></ruby>ったり<ruby>支<rt>ささ</rt></ruby>え<ruby>合<rt>あ</rt></ruby>ったりして<ruby>成<rt>な</rt></ruby>り<ruby>立<rt>た</rt></ruby>つこと。", example: "「<ruby>困<rt>こま</rt></ruby>ったときはお<ruby>互<rt>たが</rt></ruby>い<ruby>様<rt>さま</rt></ruby>。<ruby>持<rt>も</rt></ruby>ちつ<ruby>持<rt>も</rt></ruby>たれつで<ruby>助<rt>たす</rt></ruby>け<ruby>合<rt>あ</rt></ruby>おう！」" },
+            { id: 45, cat: "友達・人間関係", kotowaza: "<ruby>朱<rt>しゅ</rt></ruby>に<ruby>交<rt>まじ</rt></ruby>われば<ruby>赤<rt>あか</rt></ruby>くなる", plain: "朱に交われば赤くなる", meaning: "<ruby>人<rt>ひと</rt></ruby>は<ruby>関<rt>かか</rt></ruby>わる<ruby>友達<rt>ともだち</rt></ruby>や<ruby>環境<rt>かんきょう</rt></ruby>の<ruby>影響<rt>えいきょう</rt></ruby>を<ruby>受<rt>う</rt></ruby>けて<ruby>変化<rt>へんか</rt></ruby>すること。", example: "「<ruby>読書<rt>どくしょ</rt></ruby><ruby>好<rt>す</rt></ruby>きな<ruby>友達<rt>ともだち</rt></ruby>と<ruby>一緒<rt>いっしょ</rt></ruby>にいたら<ruby>自分<rt>じぶん</rt></ruby>も<ruby>本<rt>ほん</rt></ruby>が<ruby>好<rt>す</rt></ruby>きになった。<ruby>朱<rt>しゅ</rt></ruby>に<ruby>交<rt>まじ</rt></ruby>われば<ruby>赤<rt>あか</rt></ruby>くなるだ。」" },
+            { id: 46, cat: "友達・人間関係", kotowaza: "<ruby>竹馬<rt>ちくば</rt></ruby>の<ruby>友<rt>とも</rt></ruby>", plain: "竹馬の友", meaning: "<ruby>幼<rt>おさな</rt></ruby>い<ruby>頃<rt>ころ</rt></ruby>から<ruby>一緒<rt>いっしょ</rt></ruby>に<ruby>遊<rt>あそ</rt></ruby>んだ<ruby>幼馴染<rt>おさななじみ</rt></ruby>のこと。", example: "「<ruby>幼稚園<rt>ようちえん</rt></ruby>のときからの<ruby>大親友<rt>だいしんゆう</rt></ruby>は、<ruby>僕<rt>ぼく</rt></ruby>にとってかけがえのない<ruby>竹馬<rt>ちくば</rt></ruby>の<ruby>友<rt>とも</rt></ruby>だ。」" },
+            { id: 47, cat: "友達・人間関係", kotowaza: "<ruby>渡<rt>わた</rt></ruby>る<ruby>世間<rt>せけん</rt></ruby>に<ruby>鬼<rt>おに</rt></ruby>はない", plain: "渡る世間に鬼はない", meaning: "<ruby>世<rt>よ</rt></ruby>の中には<ruby>親切<rt>しんせつ</rt></ruby>で<ruby>温<rt>あたた</rt></ruby>かい<ruby>人<rt>ひと</rt></ruby>も<ruby>必<rt>かなら</rt></ruby>ずいること。", example: "「<ruby>道<rt>みち</rt></ruby>を<ruby>迷<rt>まよ</rt></ruby>っていたら<ruby>親切<rt>しんせつ</rt></ruby>な<ruby>人<rt>ひと</rt></ruby>が<ruby>教<rt>おし</rt></ruby>えてくれた。<ruby>渡<rt>わた</rt></ruby>る<ruby>世間<rt>せけん</rt></ruby>に<ruby>鬼<rt>おに</rt></ruby>はないなあ。」" },
+            { id: 48, cat: "友達・人間関係", kotowaza: "<ruby>恩<rt>おん</rt></ruby>を<ruby>仇<rt>あだ</rt></ruby>で<ruby>返<rt>かえ</rt></ruby>す", plain: "恩を仇で返す", meaning: "<ruby>助<rt>たす</rt></ruby>けてもらった<ruby>恩義<rt>おんぎ</rt></ruby>に対して<ruby>逆<rt>ぎゃく</rt></ruby>に<ruby>害<rt>がい</rt></ruby>や<ruby>迷惑<rt>めいわく</rt></ruby>をかけること。", example: "「<ruby>親切<rt>しんせつ</rt></ruby>に<ruby>教<rt>おし</rt></ruby>えてあげたのに<ruby>意地悪<rt>いじわる</rt></ruby>されるなんて、<ruby>恩<rt>おん</rt></ruby>を<ruby>仇<rt>あだ</rt></ruby>で<ruby>返<rt>かえ</rt></ruby>すようなものだ。」" },
+
+            // 【5. 行動・慎重・戒め】
+            { id: 49, cat: "行動・戒め", kotowaza: "<ruby>急<rt>いそ</rt></ruby>がば<ruby>回<rt>まわ</rt></ruby>れ", plain: "急がば回れ", meaning: "<ruby>急<rt>いそ</rt></ruby>いでいるときほど<ruby>安全<rt>あんぜん</rt></ruby>で<ruby>確実<rt>かくじつ</rt></ruby>な<ruby>方法<rt>ほうほう</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶ<ruby>方<rt>ほう</rt></ruby>が<ruby>早<rt>はや</rt></ruby>く<ruby>着<rt>つ</rt></ruby>くこと。", example: "「<ruby>近道<rt>ちかみち</rt></ruby>しようとして<ruby>迷<rt>まよ</rt></ruby>うより、<ruby>遠回<rt>とおまわ</rt></ruby>りでも<ruby>広<rt>ひろ</rt></ruby>い<ruby>道<rt>みち</rt></ruby>を<ruby>行<rt>い</rt></ruby>こう。<ruby>急<rt>いそ</rt></ruby>がば<ruby>回<rt>まわ</rt></ruby>れだ。」" },
+            { id: 50, cat: "行動・戒め", kotowaza: "<ruby>石橋<rt>いしばし</rt></ruby>を<ruby>叩<rt>たた</rt></ruby>いて<ruby>渡<rt>わた</rt></ruby>る", plain: "石橋を叩いて渡る", meaning: "<ruby>十分<rt>じゅうぶん</rt></ruby>に<ruby>確認<rt>かくにん</rt></ruby>と<ruby>準備<rt>じゅんび</rt></ruby>をしてから<ruby>慎重<rt>しんちょう</rt></ruby>に<ruby>行動<rt>こうどう</rt></ruby>すること。", example: "「<ruby>何度<rt>なんど</rt></ruby>も<ruby>見直<rt>みなお</rt></ruby>しをして<ruby>確認<rt>かくにん</rt></ruby>するなんて、<ruby>本当<rt>ほんとう</rt></ruby>に<ruby>石橋<rt>いしばし</rt></ruby>を<ruby>叩<rt>たた</rt></ruby>いて<ruby>渡<rt>わた</rt></ruby>る<ruby>性格<rt>せいかく</rt></ruby>だね。」" },
+            { id: 51, cat: "行動・戒め", kotowaza: "<ruby>転<rt>ころ</rt></ruby>ばぬ<ruby>先<rt>さき</rt></ruby>の<ruby>杖<rt>つえ</rt></ruby>", plain: "転ばぬ先の杖", meaning: "<ruby>失敗<rt>しっぱい</rt></ruby>しないようあらかじめ<ruby>準備<rt>じゅんび</rt></ruby>をしておくこと。", example: "「<ruby>予備<rt>よび</rt></ruby>の<ruby>傘<rt>かさ</rt></ruby>を<ruby>持<rt>も</rt></ruby>って<ruby>出<rt>で</rt></ruby>かけよう。<ruby>転<rt>ころ</rt></ruby>ばぬ<ruby>先<rt>さき</rt></ruby>の<ruby>杖<rt>つえ</rt></ruby>だよ。」" },
+            { id: 52, cat: "行動・戒め", kotowaza: "<ruby>灯台<rt>とうだい</rt></ruby><ruby>下<rt>もと</rt></ruby><ruby>暗<rt>くら</rt></ruby>し", plain: "灯台下暗し", meaning: "<ruby>身近<rt>みぢか</rt></ruby>な<ruby>場所<rt>ばしょ</rt></ruby>や<ruby>近<rt>ちか</rt></ruby>くのことほど<ruby>気<rt>き</rt></ruby>づきにくいこと。", example: "「<ruby>探<rt>さが</rt></ruby>していた<ruby>消<rt>け</rt></ruby>しゴムが<ruby>目<rt>め</rt></ruby>の<ruby>前<rt>まえ</rt></ruby>にあった！<ruby>灯台<rt>とうだい</rt></ruby><ruby>下<rt>もと</rt></ruby><ruby>暗<rt>くら</rt></ruby>しだったよ。」" },
+            { id: 53, cat: "行動・戒め", kotowaza: "<ruby>案<rt>あん</rt></ruby>ずるより<ruby>産<rt>う</rt></ruby>むが<ruby>易<rt>やす</rt></ruby>し", plain: "案ずるより産むが易し", meaning: "<ruby>始<rt>はじ</rt></ruby>める<ruby>前<rt>まえ</rt></ruby>は<ruby>悩<rt>なや</rt></ruby>むが<ruby>実際<rt>じっさい</rt></ruby>に<ruby>試<rt>ため</rt></ruby>すと<ruby>意外<rt>いがい</rt></ruby>に<ruby>簡単<rt>かんたん</rt></ruby>にできること。", example: "「<ruby>難<rt>むずか</rt></ruby>しそうに<ruby>見<rt>み</rt></ruby>えた<ruby>宿題<rt>しゅくだい</rt></ruby>もやってみたらすぐ<ruby>終<rt>お</rt></ruby>わった！<ruby>案<rt>あん</rt></ruby>ずるより<ruby>産<rt>う</rt></ruby>むが<ruby>易<rt>やす</rt></ruby>しだ。」" },
+            { id: 54, cat: "行動・戒め", kotowaza: "<ruby>頭<rt>あたま</rt></ruby><ruby>隠<rt>かく</rt></ruby>して<ruby>尻<rt>しり</rt></ruby><ruby>隠<rt>かく</rt></ruby>さず", plain: "頭隠して尻隠さず", meaning: "<ruby>悪事<rt>あくじ</rt></ruby>や<ruby>欠点<rt>けってん</rt></ruby>の<ruby>一部<rt>いちぶ</rt></ruby>だけを<ruby>隠<rt>かく</rt></ruby>して<ruby>全<rt>すべ</rt></ruby>て<ruby>隠<rt>かく</rt></ruby>せたと<ruby>思<rt>おも</rt></ruby>い<ruby>込<rt>こ</rt></ruby>んでいる<ruby>愚<rt>おろ</rt></ruby>かさのこと。", example: "「カーテンのかげに<ruby>隠<rt>かく</rt></ruby>れても<ruby>足<rt>あし</rt></ruby>が<ruby>見<rt>み</rt></ruby>えてるよ！<ruby>頭<rt>あたま</rt></ruby><ruby>隠<rt>かく</rt></ruby>して<ruby>尻<rt>しり</rt></ruby><ruby>隠<rt>かく</rt></ruby>さずだね。」" },
+            { id: 55, cat: "行動・戒め", kotowaza: "<ruby>後<rt>のち</rt></ruby>の<ruby>祭<rt>まつ</rt></ruby>り", plain: "後の祭り", meaning: "<ruby>手遅<rt>ておく</rt></ruby>れになってから<ruby>後悔<rt>こうかい</rt></ruby>してもどうにもならないこと。", example: "「テストが<ruby>終<rt>お</rt></ruby>わってから<ruby>勉強<rt>べんきょう</rt></ruby>しても<ruby>後<rt>のち</rt></ruby>の<ruby>祭<rt>まつ</rt></ruby>りだよ。」" },
+            { id: 56, cat: "行動・戒め", kotowaza: "あちら<ruby>立<rt>た</rt></ruby>てればこちらが<ruby>立<rt>た</rt></ruby>たぬ", plain: "あちら立てればこちらが立たぬ", meaning: "<ruby>一方<rt>いっぽう</rt></ruby>を<ruby>立<rt>た</rt></ruby>てるともう<ruby>一方<rt>いっぽう</rt></ruby>が<ruby>不満<rt>ふまん</rt></ruby>を<ruby>抱<rt>いだ</rt></ruby>くこと。", example: "「A<ruby>君<rt>くん</rt></ruby>とB<ruby>君<rt>くん</rt></ruby>の<ruby>意見<rt>いけん</rt></ruby>の<ruby>板挟<rt>いたばさ</rt></ruby>みで、あちら<ruby>立<rt>た</rt></ruby>てればこちらが<ruby>立<rt>た</rt></ruby>たぬの<ruby>状態<rt>じょうたい</rt></ruby>だ。」" },
+            { id: 57, cat: "行動・戒め", kotowaza: "<ruby>後足<rt>あとあし</rt></ruby>で<ruby>砂<rt>すな</rt></ruby>をかける", plain: "後足で砂をかける", meaning: "お<ruby>世話<rt>せわ</rt></ruby>になった<ruby>人<rt>ひと</rt></ruby>に対して<ruby>裏切<rt>うらぎ</rt></ruby>るような<ruby>行為<rt>こうい</rt></ruby>をして<ruby>去<rt>さ</rt></ruby>ること。", example: "「<ruby>助<rt>たす</rt></ruby>けてもらったのに<ruby>文句<rt>もんく</rt></ruby>を<ruby>言<rt>い</rt></ruby>って<ruby>去<rt>さ</rt></ruby>るなんて、<ruby>後足<rt>あとあし</rt></ruby>で<ruby>砂<rt>すな</rt></ruby>をかけるようなものだ。」" },
+            { id: 58, cat: "行動・戒め", kotowaza: "<ruby>危<rt>あぶ</rt></ruby>ない<ruby>橋<rt>はし</rt></ruby>を<ruby>渡<rt>わた</rt></ruby>る", plain: "危ない橋を渡る", meaning: "リスクが<ruby>大<rt>おお</rt></ruby>きいと<ruby>知<rt>し</rt></ruby>りながら<ruby>無理<rt>むり</rt></ruby>をして<ruby>物事<rt>ものごと</rt></ruby>を<ruby>進<rt>すす</rt></ruby>めること。", example: "「ノー<ruby>勉<rt>べん</rt></ruby>でテストに<ruby>挑<rt>いど</rt></ruby>むなんて、<ruby>危<rt>あぶ</rt></ruby>ない<ruby>橋<rt>はし</rt></ruby>を<ruby>渡<rt>わた</rt></ruby>るようなものだよ。」" },
+
+            // 【6. 人の心・比較】
+            { id: 59, cat: "人の心・比較", kotowaza: "<ruby>隣<rt>となり</rt></ruby>の<ruby>芝生<rt>しばふ</rt></ruby>は<ruby>青<rt>あお</rt></ruby>い", plain: "隣の芝生は青い", meaning: "<ruby>他人<rt>たにん</rt></ruby>の<ruby>持<rt>も</rt></ruby>っているものは<ruby>自分<rt>じぶん</rt></ruby>のものより<ruby>良<rt>よ</rt></ruby>く<ruby>見<rt>み</rt></ruby>えて<ruby>羨<rt>うらや</rt></ruby>ましくなること。", example: "「<ruby>友達<rt>ともだち</rt></ruby>のおもちゃの<ruby>方<rt>ほう</rt></ruby>が<ruby>良<rt>よ</rt></ruby>く<ruby>見<rt>み</rt></ruby>えるけれど、<ruby>隣<rt>となり</rt></ruby>の<ruby>芝生<rt>しばふ</rt></ruby>は<ruby>青<rt>あお</rt></ruby>いだけかもね。」" },
+            { id: 60, cat: "人の心・比較", kotowaza: "どんぐりの<ruby>背比<rt>せいくら</rt></ruby>べ", plain: "どんぐりの背比べ", meaning: "どれも<ruby>似<rt>に</rt></ruby>たり<ruby>寄<rt>よ</rt></ruby>ったりで<ruby>飛<rt>と</rt></ruby>び<ruby>抜<rt>ぬ</rt></ruby>けてすぐれた<ruby>者<rt>もの</rt></ruby>がいないこと。", example: "「テストの<ruby>点数<rt>てんすう</rt></ruby>はみんな<ruby>似<rt>に</rt></ruby>たり<ruby>寄<rt>よ</rt></ruby>ったりでどんぐりの<ruby>背比<rt>せいくら</rt></ruby>べだ。」" },
+            { id: 61, cat: "人の心・比較", kotowaza: "<ruby>出<rt>で</rt></ruby>る<ruby>杭<rt>くい</rt></ruby>は<ruby>打<rt>う</rt></ruby>たれる", plain: "出る杭は打たれる", meaning: "すぐれて<ruby>目立<rt>めだ</rt></ruby>つ<ruby>存在<rt>そんざい</rt></ruby>は<ruby>周囲<rt>しゅうい</rt></ruby>から<ruby>嫉妬<rt>しっと</rt></ruby>されたり<ruby>邪魔<rt>じゃま</rt></ruby>されたりすること。", example: "「<ruby>目立<rt>めだ</rt></ruby>ちすぎると<ruby>批判<rt>ひはん</rt></ruby>されることもある。<ruby>出<rt>で</rt></ruby>る<ruby>杭<rt>くい</rt></ruby>は<ruby>打<rt>う</rt></ruby>たれるだね。」" },
+            { id: 62, cat: "人の心・比較", kotowaza: "<ruby>花<rt>はな</rt></ruby>より<ruby>団子<rt>だんご</rt></ruby>", plain: "花より団子", meaning: "<ruby>外見<rt>がいけん</rt></ruby>の<ruby>華<rt>はな</rt></ruby>やかさより<ruby>実用性<rt>じつようせい</rt></ruby>や<ruby>実利<rt>じつり</rt></ruby>を<ruby>取<rt>と</rt></ruby>る<ruby>方<rt>ほう</rt></ruby>が<ruby>良<rt>よ</rt></ruby>いこと。", example: "「<ruby>花束<rt>はなたば</rt></ruby>をもらうよりお<ruby>菓子<rt>かし</rt></ruby>をもらう<ruby>方<rt>ほう</rt></ruby>がうれしい！<ruby>花<rt>はな</rt></ruby>より<ruby>団子<rt>だんご</rt></ruby>だよ。」" },
+            { id: 63, cat: "人の心・比較", kotowaza: "<ruby>知<rt>し</rt></ruby>らぬが<ruby>仏<rt>ほとけ</rt></ruby>", plain: "知らぬが仏", meaning: "<ruby>余計<rt>よけい</rt></ruby>な<ruby>事実<rt>じじつ</rt></ruby>を<ruby>知<rt>し</rt></ruby>らなければ<ruby>穏<rt>おだ</rt></ruby>やかな<ruby>気持<rt>きも</rt></ruby>ちで<ruby>過<rt>す</rt></ruby>ごせること。", example: "「サプライズパーティーの<ruby>準備<rt>じゅんび</rt></ruby>を<ruby>知<rt>し</rt></ruby>らずにニコニコしている、<ruby>知<rt>し</rt></ruby>らぬが<ruby>仏<rt>ほとけ</rt></ruby>だね。」" },
+            { id: 64, cat: "人の心・比較", kotowaza: "<ruby>塞翁<rt>さいおう</rt></ruby>が<ruby>馬<rt>うま</rt></ruby>", plain: "塞翁が馬", meaning: "<ruby>人生<rt>じんせい</rt></ruby>の<ruby>幸<rt>さいわい</rt></ruby>・<ruby>不幸<rt>ふこう</rt></ruby>は<ruby>予想<rt>よそう</rt></ruby>できず、<ruby>何<rt>なに</rt></ruby>が<ruby>吉<rt>きち</rt></ruby>と<ruby>出<rt>で</rt></ruby>るか<ruby>分<rt>わ</rt></ruby>からないこと。", example: "「<ruby>雨<rt>あめ</rt></ruby>で<ruby>試合<rt>しあい</rt></ruby>が<ruby>延期<rt>えんき</rt></ruby>になったけどおかげで<ruby>練習時間<rt>れんしゅうじかん</rt></ruby>が<ruby>増<rt>ふ</rt></ruby>えた！<ruby>塞翁<rt>さいおう</rt></ruby>が<ruby>馬<rt>うま</rt></ruby>だ。」" },
+            { id: 65, cat: "人の心・比較", kotowaza: "<ruby>鬼<rt>おに</rt></ruby>の<ruby>目<rt>め</rt></ruby>にも<ruby>涙<rt>なみだ</rt></ruby>", plain: "鬼の目にも涙", meaning: "<ruby>普段<rt>ふだん</rt></ruby>は<ruby>厳<rt>きび</rt></ruby>しい<ruby>人<rt>ひと</rt></ruby>でも<ruby>時<rt>とき</rt></ruby>には<ruby>情<rt>じょう</rt></ruby>に<ruby>動<rt>うご</rt></ruby>かされて<ruby>涙<rt>なみだ</rt></ruby>を<ruby>流<rt>なが</rt></ruby>すこと。", example: "「いつも<ruby>厳格<rt>げんかく</rt></ruby>な<ruby>先生<rt>せんせい</rt></ruby>が<ruby>卒業式<rt>そつぎょうしき</rt></ruby>で<ruby>泣<rt>な</rt></ruby>いていた。<ruby>鬼<rt>おに</rt></ruby>の<ruby>目<rt>め</rt></ruby>にも<ruby>涙<rt>なみだ</rt></ruby>だね。」" },
+            { id: 66, cat: "人の心・比較", kotowaza: "<ruby>仏<rt>ほとけ</rt></ruby>の<ruby>顔<rt>かお</rt></ruby>も<ruby>三度<rt>さんど</rt></ruby>まで", plain: "仏の顔も三度まで", meaning: "どんなに<ruby>優<rt>やさ</rt></ruby>しい<ruby>人<rt>ひと</rt></ruby>でも<ruby>何度<rt>なんど</rt></ruby>もひどいことをされれば<ruby>怒<rt>おこ</rt></ruby>り<ruby>出<rt>だ</rt></ruby>すこと。", example: "「<ruby>何度<rt>なんど</rt></ruby>もイタズラされたら<ruby>優<rt>やさ</rt></ruby>しい<ruby>先生<rt>せんせい</rt></ruby>だって<ruby>怒<rt>おこ</rt></ruby>るよ。<ruby>仏<rt>ほとけ</rt></ruby>の<ruby>顔<rt>かお</rt></ruby>も<ruby>三度<rt>さんど</rt></ruby>までだ。」" },
+            { id: 67, cat: "人の心・比較", kotowaza: "<ruby>嘘<rt>うそ</rt></ruby>つきは<ruby>泥棒<rt>どろぼう</rt></ruby>の<ruby>始<rt>はじ</rt></ruby>まり", plain: "嘘つきは泥棒の始まり", meaning: "<ruby>平気<rt>へいき</rt></ruby>で<ruby>嘘<rt>うそ</rt></ruby>をつくようになるとやがて<ruby>大<rt>おお</rt></ruby>きな<ruby>悪事<rt>あくじ</rt></ruby>を<ruby>働<rt>はたら</rt></ruby>くようになること。", example: "「ごまかして<ruby>嘘<rt>うそ</rt></ruby>をついてはダメ！<ruby>嘘<rt>うそ</rt></ruby>つきは<ruby>泥棒<rt>どろぼう</rt></ruby>の<ruby>始<rt>はじ</rt></ruby>まりだよ。」" },
+            { id: 68, cat: "人の心・比較", kotowaza: "<ruby>嘘<rt>うそ</rt></ruby>も<ruby>方便<rt>ほうべん</rt></ruby>", plain: "嘘も方便", meaning: "<ruby>物事<rt>ものごと</rt></ruby>をスムーズに<ruby>運<rt>はこ</rt></ruby>ぶためには<ruby>時<rt>とき</rt></ruby>には<ruby>嘘<rt>うそ</rt></ruby>も<ruby>必要<rt>ひつよう</rt></ruby>なこと。", example: "「<ruby>相手<rt>あいて</rt></ruby>を<ruby>傷<rt>きず</rt></ruby>つけないために<ruby>優<rt>やさ</rt></ruby>しい<ruby>嘘<rt>うそ</rt></ruby>をつくこともある。<ruby>嘘<rt>うそ</rt></ruby>も<ruby>方便<rt>ほうべん</rt></ruby>だね。」" },
+
+            // 【7. 運・境遇・展開】
+            { id: 69, cat: "運・境遇", kotowaza: "<ruby>棚<rt>たな</rt></ruby>から<ruby>牡丹餅<rt>ぼたもち</rt></ruby>", plain: "棚から牡丹餅", meaning: "<ruby>自分<rt>じぶん</rt></ruby>では<ruby>何<rt>なに</rt></ruby>も<ruby>苦労<rt>くろう</rt></ruby>していないのに<ruby>思<rt>おも</rt></ruby>いがけない<ruby>幸運<rt>こううん</rt></ruby>が<ruby>舞<rt>まい</rt></ruby>い<ruby>込<rt>こ</rt></ruby>むこと。", example: "「くじ<ruby>引<rt>び</rt></ruby>きで<ruby>特賞<rt>とくしょう</rt></ruby>が<ruby>当<rt>あ</rt></ruby>たるなんて、<ruby>棚<rt>たな</rt></ruby>から<ruby>牡丹餅<rt>ぼたもち</rt></ruby>だ！」" },
+            { id: 70, cat: "運・境遇", kotowaza: "<ruby>濡<rt>ぬ</rt></ruby>れ<ruby>手<rt>て</rt></ruby>で<ruby>粟<rt>あわ</rt></ruby>", plain: "濡れ手で粟", meaning: "<ruby>特別<rt>とくべつ</rt></ruby>な<ruby>苦労<rt>くろう</rt></ruby>をせずに<ruby>大<rt>おお</rt></ruby>きな<ruby>利益<rt>りえき</rt></ruby>を<ruby>簡単<rt>かんたん</rt></ruby>に<ruby>得<rt>え</rt></ruby>ること。", example: "「<ruby>簡単<rt>かんたん</rt></ruby>に<ruby>大儲<rt>おおもう</rt></ruby>けできるなんて<ruby>濡<rt>ぬ</rt></ruby>れ<ruby>手<rt>て</rt></ruby>で<ruby>粟<rt>あわ</rt></ruby>のような<ruby>話<rt>はなし</rt></ruby>だね。」" },
+            { id: 71, cat: "運・境遇", kotowaza: "<ruby>笑<rt>わら</rt></ruby>う<ruby>門<rt>かど</rt></ruby>には<ruby>福<rt>ふく</rt></ruby><ruby>来<rt>きた</rt></ruby>る", plain: "笑う門には福来る", meaning: "いつも<ruby>笑顔<rt>えがお</rt></ruby>で<ruby>明<rt>あか</rt></ruby>るい<ruby>場所<rt>ばしょ</rt></ruby>には<ruby>自然<rt>しぜん</rt></ruby>と<ruby>幸<rt>しあわ</rt></ruby>せがやってくること。", example: "「いつも<ruby>笑顔<rt>えがお</rt></ruby>でいればきっと<ruby>良<rt>よ</rt></ruby>いことがあるよ！<ruby>笑<rt>わら</rt></ruby>う<ruby>門<rt>かど</rt></ruby>には<ruby>福<rt>ふく</rt></ruby><ruby>来<rt>きた</rt></ruby>るだ。」" },
+            { id: 72, cat: "運・境遇", kotowaza: "<ruby>雨<rt>あめ</rt></ruby><ruby>降<rt>ふ</rt></ruby>って<ruby>地<rt>じ</rt></ruby><ruby>固<rt>かた</rt></ruby>まる", plain: "雨降って地固まる", meaning: "<ruby>揉<rt>も</rt></ruby>め<ruby>事<rt>ごと</rt></ruby>があった<ruby>後<rt>あと</rt></ruby>はかえって<ruby>基盤<rt>きばん</rt></ruby>がしっかりすること。", example: "「<ruby>喧嘩<rt>けんか</rt></ruby>したけれど<ruby>本音<rt>ほんね</rt></ruby>で<ruby>話<rt>はな</rt></ruby>せて<ruby>前<rt>まえ</rt></ruby>より<ruby>仲良<rt>なかよ</rt></ruby>くなれた。<ruby>雨<rt>あめ</rt></ruby><ruby>降<rt>ふ</rt></ruby>って<ruby>地<rt>じ</rt></ruby><ruby>固<rt>かた</rt></ruby>まるだ。」" },
+            { id: 73, cat: "運・境遇", kotowaza: "<ruby>焼<rt>や</rt></ruby>け<ruby>石<rt>いし</rt></ruby>に<ruby>水<rt>みず</rt></ruby>", plain: "焼け石に水", meaning: "<ruby>少<rt>すこ</rt></ruby>しばかりの<ruby>助<rt>たす</rt></ruby>けでは<ruby>何<rt>なに</rt></ruby>の<ruby>効果<rt>こうか</rt></ruby>も<ruby>期待<rt>きたい</rt></ruby>できないこと。", example: "「こんなに<ruby>山<rt>やま</rt></ruby>づみの<ruby>宿題<rt>しゅくだい</rt></ruby>にたった5<ruby>分<rt>ふん</rt></ruby><ruby>勉強<rt>べんきょう</rt></ruby>しても<ruby>焼<rt>や</rt></ruby>け<ruby>石<rt>いし</rt></ruby>に<ruby>水<rt>みず</rt></ruby>だ。」" },
+            { id: 74, cat: "運・境遇", kotowaza: "<ruby>弱<rt>よわ</rt></ruby>り<ruby>目<rt>め</rt></ruby>に<ruby>祟<rt>たた</rt></ruby>り<ruby>目<rt>め</rt></ruby>", plain: "弱り目に祟り目", meaning: "<ruby>困<rt>こま</rt></ruby>っているときにさらに<ruby>不運<rt>ふうん</rt></ruby>や<ruby>災難<rt>さいなん</rt></ruby>が<ruby>重<rt>かさ</rt></ruby>なること。", example: "「<ruby>風邪<rt>かぜ</rt></ruby>をひいた<ruby>上<rt>うえ</rt></ruby>に<ruby>大事<rt>だいじ</rt></ruby>なものをなくすなんて、<ruby>弱<rt>よわ</rt></ruby>り<ruby>目<rt>め</rt></ruby>に<ruby>祟<rt>たた</rt></ruby>り<ruby>目<rt>め</rt></ruby>だ。」" },
+            { id: 75, cat: "運・境遇", kotowaza: "<ruby>溺<rt>おぼ</rt></ruby>れる<ruby>者<rt>もの</rt></ruby>は<ruby>藁<rt>わら</rt></ruby>をも<ruby>掴<rt>つか</rt></ruby>む", plain: "溺れる者は藁をも掴む", meaning: "<ruby>追<rt>お</rt></ruby>いつめられたときはどんな<ruby>頼<rt>たよ</rt></ruby>りないものでも<ruby>頼<rt>たよ</rt></ruby>ろうとすること。", example: "「テスト<ruby>直前<rt>ちょくぜん</rt></ruby>にどんな<ruby>小<rt>ちい</rt></ruby>さなヒントでもすがりつく、<ruby>溺<rt>おぼ</rt></ruby>れる<ruby>者<rt>もの</rt></ruby>は<ruby>藁<rt>わら</rt></ruby>をも<ruby>掴<rt>つか</rt></ruby>むだ。」" },
+            { id: 76, cat: "運・境遇", kotowaza: "ひょうたんから<ruby>駒<rt>こま</rt></ruby>が<ruby>出<rt>で</rt></ruby>る", plain: "ひょうたんから駒が出る", meaning: "<ruby>思<rt>おも</rt></ruby>いがけない<ruby>意外<rt>いがい</rt></ruby>なことが<ruby>起<rt>お</rt></ruby>こること。", example: "「<ruby>冗談<rt>じょうだん</rt></ruby>で<ruby>言<rt>い</rt></ruby>ったことが<ruby>本当<rt>ほんとう</rt></ruby>になって<ruby>驚<rt>おどろ</rt></ruby>いた！ひょうたんから<ruby>駒<rt>こま</rt></ruby>が<ruby>出<rt>で</rt></ruby>るだ。」" },
+            { id: 77, cat: "運・境遇", kotowaza: "<ruby>果報<rt>かほう</rt></ruby>は<ruby>寝<rt>ね</rt></ruby>て<ruby>待<rt>ま</rt></ruby>て", plain: "果報は寝て待て", meaning: "<ruby>幸運<rt>こううん</rt></ruby>は<ruby>焦<rt>あせ</rt></ruby>っても<ruby>仕方<rt>しかた</rt></ruby>がないので<ruby>時期<rt>じき</rt></ruby>が<ruby>来<rt>く</rt></ruby>るのをじっくり<ruby>待<rt>ま</rt></ruby>つのが<ruby>良<rt>よ</rt></ruby>いこと。", example: "「やれるだけの<ruby>準備<rt>じゅんび</rt></ruby>はしたから、あとは<ruby>焦<rt>あせ</rt></ruby>らず<ruby>果報<rt>かほう</rt></ruby>は<ruby>寝<rt>ね</rt></ruby>て<ruby>待<rt>ま</rt></ruby>てだね。」" },
+            { id: 78, cat: "運・境遇", kotowaza: "<ruby>地獄<rt>じごく</rt></ruby>で<ruby>仏<rt>ほとけ</rt></ruby>に<ruby>会<rt>あ</rt></ruby>ったよう", plain: "地獄で仏に会ったよう", meaning: "<ruby>困<rt>こま</rt></ruby>り<ruby>果<rt>は</rt></ruby>てた<ruby>状況<rt>じょうきょう</rt></ruby>で<ruby>思<rt>おも</rt></ruby>いがけない<ruby>救<rt>すく</rt></ruby>いに<ruby>巡<rt>めぐ</rt></ruby>り<ruby>会<rt>あ</rt></ruby>うこと。", example: "「<ruby>道<rt>みち</rt></ruby>に<ruby>迷<rt>まよ</rt></ruby>って<ruby>途方<rt>とほう</rt></ruby>に<ruby>暮<rt>く</rt></ruby>れていたときに<ruby>友達<rt>ともだち</rt></ruby>が<ruby>迎<rt>むか</rt></ruby>えに<ruby>来<rt>き</rt></ruby>てくれて、<ruby>地獄<rt>じごく</rt></ruby>で<ruby>仏<rt>ほとけ</rt></ruby>に<ruby>会<rt>あ</rt></ruby>ったようだった。」" },
+
+            // 【8. 状態・手応え】
+            { id: 79, cat: "状態・手応え", kotowaza: "<ruby>二階<rt>にかい</rt></ruby>から<ruby>目薬<rt>めぐすり</rt></ruby>", plain: "二階から目薬", meaning: "やり<ruby>方<rt>かた</rt></ruby>が<ruby>遠回<rt>とおまわ</rt></ruby>りでもどかしく<ruby>全<rt>まった</rt></ruby>く<ruby>効果<rt>こうか</rt></ruby>が<ruby>得<rt>え</rt></ruby>られないこと。", example: "「<ruby>遠<rt>とお</rt></ruby>くから<ruby>指示<rt>しじ</rt></ruby>を<ruby>出<rt>だ</rt></ruby>しても<ruby>伝<rt>つた</rt></ruby>わらない、<ruby>二階<rt>にかい</rt></ruby>から<ruby>目薬<rt>めぐすり</rt></ruby>だよ。」" },
+            { id: 80, cat: "状態・手応え", kotowaza: "のれんに<ruby>腕押<rt>うでお</rt></ruby>し", plain: "のれんに腕押し", meaning: "いくら<ruby>働<rt>はたら</rt></ruby>きかけても<ruby>手<rt>て</rt></ruby>ごたえが<ruby>全<rt>まった</rt></ruby>く<ruby>感<rt>かん</rt></ruby>じられないこと。", example: "「いくらアドバイスしても<ruby>生返事<rt>なまへんじ</rt></ruby>ばかりで、のれんに<ruby>腕押<rt>うでお</rt></ruby>しだ。」" },
+            { id: 81, cat: "状態・手応え", kotowaza: "ぬかに<ruby>釘<rt>くぎ</rt></ruby>", plain: "ぬかに釘", meaning: "<ruby>何<rt>なに</rt></ruby>の<ruby>手応<rt>てごた</rt></ruby>えも<ruby>効<rt>き</rt></ruby>き<ruby>目<rt>め</rt></ruby>もなく<ruby>無駄<rt>むだ</rt></ruby>に<ruby>終<rt>お</rt></ruby>わること。", example: "「どれだけ<ruby>注意<rt>ちゅうい</rt></ruby>しても<ruby>全<rt>まった</rt></ruby>く<ruby>響<rt>ひび</rt></ruby>かない、ぬかに<ruby>釘<rt>くぎ</rt></ruby>だね。」" },
+            { id: 82, cat: "状態・手応え", kotowaza: "<ruby>豆腐<rt>とうふ</rt></ruby>にかすがい", plain: "豆腐にかすがい", meaning: "<ruby>意見<rt>いけん</rt></ruby>や<ruby>忠告<rt>ちゅうこく</rt></ruby>をしても<ruby>全<rt>まった</rt></ruby>く<ruby>効果<rt>こうか</rt></ruby>がないこと。", example: "「<ruby>何<rt>なに</rt></ruby>を<ruby>言<rt>い</rt></ruby>っても<ruby>全<rt>まった</rt></ruby>く<ruby>効<rt>き</rt></ruby>き<ruby>目<rt>め</rt></ruby>がないなんて、<ruby>豆腐<rt>とうふ</rt></ruby>にかすがいの<ruby>状態<rt>じょうたい</rt></ruby>だ。」" },
+            { id: 83, cat: "状態・手応え", kotowaza: "<ruby>背<rt>せ</rt></ruby>に<ruby>腹<rt>はら</rt></ruby>は<ruby>代<rt>か</rt></ruby>えられない", plain: "背に腹は代えられない", meaning: "<ruby>危機<rt>きき</rt></ruby>を<ruby>根<rt>の</rt></ruby>り<ruby>越<rt>こ</rt></ruby>すためなら<ruby>多少<rt>たしょう</rt></ruby>の<ruby>犠牲<rt>ぎせい</rt></ruby>や<ruby>不都合<rt>ふつごう</rt></ruby>は<ruby>仕方<rt>しかた</rt></ruby>がないこと。", example: "「<ruby>背<rt>せ</rt></ruby>に<ruby>腹<rt>はら</rt></ruby>は<ruby>代<rt>か</rt></ruby>えられないから、<ruby>恥<rt>はじ</rt></ruby>を<ruby>忍<rt>しの</rt></ruby>んで<ruby>助<rt>たす</rt></ruby>けを<ruby>求<rt>もと</rt></ruby>めよう。」" },
+            { id: 84, cat: "状態・手応え", kotowaza: "<ruby>時<rt>とき</rt></ruby>は<ruby>金<rt>かね</rt></ruby>なり", plain: "時は金なり", meaning: "<ruby>時間<rt>じかん</rt></ruby>は非常にお<ruby>金<rt>かね</rt></ruby>と<ruby>同<rt>おな</rt></ruby>じくらい<ruby>貴重<rt>きちょう</rt></ruby>なものであること。", example: "「ダラダラ<ruby>過<rt>す</rt></ruby>ごさずに<ruby>時間<rt>じかん</rt></ruby>を<ruby>大切<rt>たいせつ</rt></ruby>にしよう。<ruby>時<rt>とき</rt></ruby>は<ruby>金<rt>かね</rt></ruby>なりだからね。」" },
+            { id: 85, cat: "状態・手応え", kotowaza: "<ruby>絵<rt>え</rt></ruby>に<ruby>描<rt>えが</rt></ruby>いた<ruby>餅<rt>もち</rt></ruby>", plain: "絵に描いた餅", meaning: "どれほど<ruby>立派<rt>りっぱ</rt></ruby>な<ruby>計画<rt>けいかく</rt></ruby>でも<ruby>実行<rt>じっこう</rt></ruby>できなければ<ruby>役<rt>やく</rt></ruby>に<ruby>立<rt>た</rt></ruby>たないこと。", example: "「どんなに<ruby>素晴<rt>すば</rt></ruby>らしい<ruby>計画<rt>けいかく</rt></ruby>も<ruby>実行<rt>じっこう</rt></ruby>しなければ<ruby>絵<rt>え</rt></ruby>に<ruby>描<rt>えが</rt></ruby>いた<ruby>餅<rt>もち</rt></ruby>だよ。」" },
+            { id: 86, cat: "状態・手応え", kotowaza: "<ruby>海老<rt>えび</rt></ruby>で<ruby>鯛<rt>たい</rt></ruby>を<ruby>釣<rt>つ</rt></ruby>る", plain: "海老で鯛を釣る", meaning: "<ruby>小<rt>ちい</rt></ruby>さな<ruby>労力<rt>ろうりょく</rt></ruby>や<ruby>贈<rt>おく</rt></ruby>り<ruby>物<rt>もの</rt></ruby>で<ruby>大<rt>おお</rt></ruby>きな<ruby>成果<rt>せいか</rt></ruby>を<ruby>得<rt>え</rt></ruby>ること。", example: "「100<ruby>円<rt>えん</rt></ruby>のプレゼントで<ruby>豪華<rt>ごうか</rt></ruby>なお<ruby>返<rt>かえ</rt></ruby>しをもらうなんて、<ruby>海老<rt>えび</rt></ruby>で<ruby>鯛<rt>たい</rt></ruby>を<ruby>釣<rt>つ</rt></ruby>るだ。」" },
+            { id: 87, cat: "状態・手応え", kotowaza: "<ruby>縁<rt>えん</rt></ruby>の<ruby>下<rt>した</rt></ruby>の<ruby>力持<rt>ちからも</rt></ruby>ち", plain: "縁の下の力持ち", meaning: "<ruby>目立<rt>めだ</rt></ruby>たない<ruby>場所<rt>ばしょ</rt></ruby>で<ruby>陰<rt>かげ</rt></ruby>ながら<ruby>物事<rt>ものごと</rt></ruby>を<ruby>支<rt>ささ</rt></ruby>えている<ruby>人<rt>ひと</rt></ruby>のこと。", example: "「<ruby>舞台<rt>ぶたい</rt></ruby>の<ruby>裏方<rt>うらかた</rt></ruby>で<ruby>準備<rt>じゅんび</rt></ruby>をしてくれた<ruby>人<rt>ひと</rt></ruby>は、まさに<ruby>縁<rt>えん</rt></ruby>の<ruby>下<rt>した</rt></ruby>の<ruby>力持<rt>ちからも</rt></ruby>ちだね。」" },
+            { id: 88, cat: "状態・手応え", kotowaza: "<ruby>身<rt>み</rt></ruby>から<ruby>出<rt>で</rt></ruby>た<ruby>錆<rt>さび</rt></ruby>", plain: "身から出た錆", meaning: "<ruby>自分自身<rt>じぶんじしん</rt></ruby>の<ruby>悪<rt>わる</rt></ruby>い<ruby>行<rt>おこな</rt></ruby>いや<ruby>過<rt>あやまち</rt></ruby>ちのせいで<ruby>自分自身<rt>じぶんじしん</rt></ruby>が<ruby>苦<rt>くる</rt></ruby>しむこと。", example: "「<ruby>宿題<rt>しゅくだい</rt></ruby>をサボって<ruby>怒<rt>おこ</rt></ruby>られるのは<ruby>自業自得<rt>じごうじとく</rt></ruby>、<ruby>身<rt>み</rt></ruby>から<ruby>出<rt>で</rt></ruby>た<ruby>錆<rt>さび</rt></ruby>だよ。」" },
+
+            // 【9. 自然・世相・教訓】
+            { id: 89, cat: "自然・教訓", kotowaza: "<ruby>暑<rt>あつ</rt></ruby>さ<ruby>寒<rt>さむ</rt></ruby>さも<ruby>彼岸<rt>ひがん</rt></ruby>まで", plain: "暑さ寒さも彼岸まで", meaning: "<ruby>厳<rt>きび</rt></ruby>しい<ruby>暑<rt>あつ</rt></ruby>さや<ruby>寒<rt>さむ</rt></ruby>さも<ruby>彼岸<rt>ひがん</rt></ruby>の<ruby>時期<rt>じき</rt></ruby>になれば<ruby>和ら<rt>やわら</rt></ruby>いで<ruby>過<rt>す</rt></ruby>ごしやすくなること。", example: "「どんなに<ruby>寒<rt>さむ</rt></ruby>くてももうすぐ<ruby>暖<rt>あたた</rt></ruby>かくなるよ。<ruby>暑<rt>あつ</rt></ruby>さ<ruby>寒<rt>さむ</rt></ruby>さも<ruby>彼岸<rt>ひがん</rt></ruby>までだ。」" },
+            { id: 90, cat: "自然・教訓", kotowaza: "<ruby>一年代<rt>いちねん</rt></ruby>の<ruby>計<rt>けい</rt></ruby>は<ruby>元旦<rt>がんたん</rt></ruby>にあり", plain: "一年の計は元旦にあり", meaning: "<ruby>一年<rt>いちねん</rt></ruby>の<ruby>計画<rt>けいかく</rt></ruby>は<ruby>年<rt>とし</rt></ruby>の<ruby>初<rt>はじ</rt></ruby>めである<ruby>元旦<rt>がんたん</rt></ruby>に<ruby>立<rt>た</rt></ruby>てるべきだということ。", example: "「<ruby>一年<rt>いちねん</rt></ruby>の<ruby>計<rt>けい</rt></ruby>は<ruby>元旦<rt>がんたん</rt></ruby>にあり。お<ruby>正月<rt>しょうがつ</rt></ruby>に<ruby>今年<rt>ことし</rt></ruby>の<ruby>目標<rt>もくひょう</rt></ruby>をしっかり<ruby>立<rt>た</rt></ruby>てよう。」" },
+            { id: 91, cat: "自然・教訓", kotowaza: "<ruby>一富士<rt>いちふじ</rt></ruby><ruby>二鷹<rt>にたか</rt></ruby><ruby>三茄子<rt>さんなすび</rt></ruby>", plain: "一富士二鷹三茄子", meaning: "<ruby>初夢<rt>はつゆめ</rt></ruby>で<ruby>見<rt>み</rt></ruby>ると<ruby>縁起<rt>えんぎ</rt></ruby>が<ruby>良<rt>よ</rt></ruby>いとされる<ruby>代表的<rt>だいひょうてき</rt></ruby>な<ruby>三<rt>みっ</rt></ruby>つのもの。", example: "「<ruby>初夢<rt>はつゆめ</rt></ruby>に<ruby>富士山<rt>ふじさん</rt></ruby>が<ruby>出<rt>で</rt></ruby>てきた！<ruby>一富士<rt>いちふじ</rt></ruby><ruby>二鷹<rt>にたか</rt></ruby><ruby>三茄子<rt>さんなすび</rt></ruby>で<ruby>縁起<rt>えんぎ</rt></ruby>がいいぞ。」" },
+            { id: 92, cat: "自然・教訓", kotowaza: "<ruby>驕<rt>おご</rt></ruby>る<ruby>平家<rt>へいけ</rt></ruby>は<ruby>久<rt>ひさ</rt></ruby>しからず", plain: "驕る平家は久しからず", meaning: "<ruby>威張<rt>いば</rt></ruby>って<ruby>思<rt>おも</rt></ruby>い<ruby>上<rt>あ</rt></ruby>がっている<ruby>者<rt>もの</rt></ruby>は<ruby>長続<rt>ながつづ</rt></ruby>きせずやがて<ruby>衰<rt>おとろ</rt></ruby>えること。", example: "「<ruby>威張<rt>いば</rt></ruby>ってばかりいると<ruby>誰<rt>だれ</rt></ruby>もついてこなくなる。<ruby>驕<rt>おご</rt></ruby>る<ruby>平家<rt>へいけ</rt></ruby>は<ruby>久<rt>ひさ</rt></ruby>しからずだ。」" },
+            { id: 93, cat: "自然・教訓", kotowaza: "<ruby>寄<rt>よ</rt></ruby>らば<ruby>大樹<rt>たいじゅ</rt></ruby>の<ruby>陰<rt>かげ</rt></ruby>", plain: "寄らば大樹の陰", meaning: "<ruby>頼<rt>たよ</rt></ruby>るならば<ruby>力<rt>ちから</rt></ruby>や<ruby>影響力<rt>えいきょうりょく</rt></ruby>のある<ruby>大<rt>おお</rt></ruby>きな<ruby>存在<rt>そんざい</rt></ruby>を<ruby>頼<rt>たよ</rt></ruby>る<ruby>方<rt>ほう</rt></ruby>が<ruby>安全<rt>あんぜん</rt></ruby>だということ。", example: "「<ruby>強<rt>つよ</rt></ruby>いチームに<ruby>入<rt>はい</rt></ruby>って<ruby>一緒<rt>いっしょ</rt></ruby>に<ruby>練習<rt>れんしゅう</rt></ruby>しよう。<ruby>寄<rt>よ</rt></ruby>らば<ruby>大樹<rt>たいじゅ</rt></ruby>の<ruby>陰<rt>かげ</rt></ruby>だ。」" },
+            { id: 94, cat: "自然・教訓", kotowaza: "<ruby>対岸<rt>たいがん</rt></ruby>の<ruby>火事<rt>かじ</rt></ruby>", plain: "対岸の火事", meaning: "<ruby>自分<rt>じぶん</rt></ruby>には<ruby>全<rt>まった</rt></ruby>く<ruby>影響<rt>えいきょう</rt></ruby>や<ruby>災難<rt>さいなん</rt></ruby>が<ruby>及<rt>およ</rt></ruby>ばない<ruby>他人事<rt>ひとごと</rt></ruby>のこと。", example: "「<ruby>隣<rt>となり</rt></ruby>のクラスのトラブルだからって<ruby>対岸<rt>たいがん</rt></ruby>の<ruby>火事<rt>かじ</rt></ruby>だと<ruby>思<rt>おも</rt></ruby>わず<ruby>協力<rt>きょうりょく</rt></ruby>しよう。」" },
+            { id: 95, cat: "自然・教訓", kotowaza: "<ruby>木<rt>き</rt></ruby>を<ruby>見<rt>み</rt></ruby>て<ruby>森<rt>もり</rt></ruby>を<ruby>見<rt>み</rt></ruby>ず", plain: "木を見て森を見ず", meaning: "<ruby>小<rt>ちい</rt></ruby>さな<ruby>部分<rt>ぶぶん</rt></ruby>ばかりにとらわれて<ruby>全体像<rt>ぜんたいぞう</rt></ruby>が<ruby>見<rt>み</rt></ruby>えていないこと。", example: "「<ruby>細<rt>こま</rt></ruby>かいミスばかり<ruby>気<rt>き</rt></ruby>にして<ruby>全体<rt>ぜんたい</rt></ruby>が<ruby>進<rt>すす</rt></ruby>まない。<ruby>木<rt>き</rt></ruby>を<ruby>見<rt>み</rt></ruby>て<ruby>森<rt>もり</rt></ruby>を<ruby>見<rt>み</rt></ruby>ずにならないようにね。」" },
+            { id: 96, cat: "自然・教訓", kotowaza: "<ruby>船頭<rt>せんどう</rt></ruby><ruby>多<rt>おお</rt></ruby>くして<ruby>船<rt>ふね</rt></ruby><ruby>山<rt>やま</rt></ruby>に<ruby>登<rt>のぼ</rt></ruby>る", plain: "船頭多くして船山に登る", meaning: "<ruby>指図<rt>さしず</rt></ruby>する<ruby>人<rt>ひと</rt></ruby>が<ruby>多<rt>おお</rt></ruby>すぎてまとまらず<ruby>間違<rt>まちが</rt></ruby>った<ruby>方向<rt>ほうこう</rt></ruby>へ<ruby>進<rt>すす</rt></ruby>むこと。", example: "「みんなが<ruby>好<rt>す</rt></ruby>き<ruby>勝手<rt>かって</rt></ruby>に<ruby>指示<rt>しじ</rt></ruby>を<ruby>出<rt>だ</rt></ruby>してまとまらない、<ruby>船頭<rt>せんどう</rt></ruby><ruby>多<rt>おお</rt></ruby>くして<ruby>船<rt>ふね</rt></ruby><ruby>山<rt>やま</rt></ruby>に<ruby>登<rt>のぼ</rt></ruby>るだ。」" },
+
+            // 【10. 親子・結末】
+            { id: 97, cat: "親子・結末", kotowaza: "かわいい<ruby>子<rt>こ</rt></ruby>には<ruby>旅<rt>たび</rt></ruby>をさせよ", plain: "かわいい子には旅をさせよ", meaning: "<ruby>子供<rt>こども</rt></ruby>が<ruby>愛<rt>いとお</rt></ruby>しいなら<ruby>甘<rt>あま</rt></ruby>ややかさず<ruby>外<rt>そと</rt></ruby>で<ruby>苦労<rt>くろう</rt></ruby>や<ruby>経験<rt>けいけん</rt></ruby>をさせるべきだということ。", example: "「<ruby>一人<rt>ひとり</rt></ruby>でキャンプに<ruby>行<rt>い</rt></ruby>かせるのは、かわいい<ruby>子<rt>こ</rt></ruby>には<ruby>旅<rt>たび</rt></ruby>をさせよの<ruby>気持<rt>きも</rt></ruby>ちからだ。」" },
+            { id: 98, cat: "親子・結末", kotowaza: "<ruby>親<rt>おや</rt></ruby><ruby>思<rt>おも</rt></ruby>う<ruby>心<rt>こころ</rt></ruby>に<ruby>勝<rt>まさ</rt></ruby>る<ruby>親心<rt>おやごころ</rt></ruby>", plain: "親思う心に勝る親心", meaning: "<ruby>子供<rt>こども</rt></ruby>が<ruby>親<rt>おや</rt></ruby>を<ruby>大切<rt>たいせつ</rt></ruby>に<ruby>想<rt>おも</rt></ruby>う<ruby>気持<rt>きも</rt></ruby>ち<ruby>以上<rt>いじょう</rt></ruby>に<ruby>親<rt>おや</rt></ruby>が<ruby>子<rt>こ</rt></ruby>を<ruby>想<rt>おも</rt></ruby>う<ruby>愛<rt>あい</rt></ruby>の<ruby>方<rt>ほう</rt></ruby>が<ruby>深<rt>ふか</rt></ruby>いこと。", example: "「<ruby>子供<rt>こども</rt></ruby>の<ruby>心配<rt>しんぱい</rt></ruby>をするお<ruby>母<rt>かあ</rt></ruby>さんの<ruby>深<rt>ふか</rt></ruby>い<ruby>愛<rt>あい</rt></ruby>は、<ruby>親<rt>おや</rt></ruby><ruby>思<rt>おも</rt></ruby>う<ruby>心<rt>こころ</rt></ruby>に<ruby>勝<rt>まさ</rt></ruby>る<ruby>親心<rt>おやごころ</rt></ruby>だね。」" },
+            { id: 99, cat: "親子・結末", kotowaza: "<ruby>親<rt>おや</rt></ruby>の<ruby>心<rt>こころ</rt></ruby><ruby>子<rt>こ</rt></ruby><ruby>知<rt>し</rt></ruby>らず", plain: "親の心子知らず", meaning: "<ruby>親<rt>おや</rt></ruby>が<ruby>子供<rt>こども</rt></ruby>を<ruby>想<rt>おも</rt></ruby>う<ruby>温<rt>あたた</rt></ruby>かい<ruby>気持<rt>きも</rt></ruby>ちや<ruby>苦労<rt>くろう</rt></ruby>を<ruby>子供<rt>こども</rt></ruby>は<ruby>分<rt>わ</rt></ruby>かってくれないこと。", example: "「<ruby>心配<rt>しんぱい</rt></ruby>して<ruby>言<rt>い</rt></ruby>ってくれているのに<ruby>反抗<rt>はんこう</rt></ruby>してしまう、<ruby>親<rt>おや</rt></ruby>の<ruby>心<rt>こころ</rt></ruby><ruby>子<rt>こ</rt></ruby><ruby>知<rt>し</rt></ruby>らずだね。」" },
+            { id: 100, cat: "親子・結末", kotowaza: "<ruby>終<rt>お</rt></ruby>わり<ruby>良<rt>よ</rt></ruby>ければ<ruby>全<rt>すべ</rt></ruby>て<ruby>良<rt>よ</rt></ruby>し", plain: "終わり良ければ全て良し", meaning: "<ruby>過程<rt>かてい</rt></ruby>で<ruby>苦労<rt>くろう</rt></ruby>があっても<ruby>結末<rt>けつまつ</rt></ruby>が<ruby>良好<rt>りょうこう</rt></ruby>であれば<ruby>全<rt>すべ</rt></ruby>て<ruby>良<rt>よ</rt></ruby>いと<ruby>思<rt>おも</rt></ruby>えること。", example: "「いろいろ<ruby>大変<rt>たいへん</rt></ruby>だったけれど<ruby>最後<rt>さいご</rt></ruby>は<ruby>大成功<rt>だいせいこう</rt></ruby>！<ruby>終<rt>お</rt></ruby>わり<ruby>良<rt>よ</rt></ruby>ければ<ruby>全<rt>すべ</rt></ruby>て<ruby>良<rt>よ</rt></ruby>しだね。」" }
+        ];
+
+        const MONSTERS = [
+            { name: "ことわざモグラ", icon: "👾" },
+            { name: "ナゾトキゴブリン", icon: "👺" },
+            { name: "漢字ドラゴン", icon: "🐉" },
+            { name: "マモノオオカミ", icon: "🐺" },
+            { name: "ことわざ魔王", icon: "🦹‍♂️" },
+            { name: "ちえのフクロウ", icon: "🦉" },
+            { name: "ひらめきゴーレム", icon: "🗿" },
+            { name: "じゅけんナイト", icon: "⚔️" },
+            { name: "ことわざタイガー", icon: "🐯" },
+            { name: "ことわざ大魔神", icon: "👹" }
+        ];
+
+        let gameState = {
+            level: 1,
+            exp: 0,
+            score: 0,
+            currentQuestionIndex: 0,
+            questions: [],
+            correctCount: 0,
+            combo: 0,
+            unlockedProverbs: new Set(),
+            selectedCategoryFilter: "すべて"
+        };
+
+        const screens = {
+            start: document.getElementById('start-screen'),
+            quiz: document.getElementById('quiz-screen'),
+            result: document.getElementById('result-screen'),
+            zukan: document.getElementById('zukan-screen')
+        };
+
+        function showScreen(screenName) {
+            Object.keys(screens).forEach(key => {
+                screens[key].classList.add('hidden');
+            });
+            screens[screenName].classList.remove('hidden');
+        }
+
+        function updateTitleAndLevel() {
+            const levelTitles = [
+                "見習い勇者", "ことわざ見習い", "ことわざ冒険者", 
+                "ことわざ物知り", "ことわざ博士", "ことわざマスター", "語彙力の神"
+            ];
+            const titleIndex = Math.min(Math.floor((gameState.level - 1) / 2), levelTitles.length - 1);
+            
+            document.getElementById('user-level').innerText = gameState.level;
+            document.getElementById('user-title').innerText = levelTitles[titleIndex];
+        }
+
+        function startQuiz() {
+            const shuffled = [...PROVERBS].sort(() => 0.5 - Math.random());
+            gameState.questions = shuffled.slice(0, 5);
+            gameState.currentQuestionIndex = 0;
+            gameState.score = 0;
+            gameState.correctCount = 0;
+            gameState.combo = 0;
+
+            document.getElementById('quiz-score').innerText = "0";
+            updateComboUI();
+
+            showScreen('quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const qData = gameState.questions[gameState.currentQuestionIndex];
+            const monster = MONSTERS[gameState.currentQuestionIndex % MONSTERS.length];
+
+            document.getElementById('current-q-num').innerText = gameState.currentQuestionIndex + 1;
+            document.getElementById('monster-avatar').innerText = monster.icon;
+            document.getElementById('monster-name').innerText = monster.name;
+            document.getElementById('monster-hp').style.width = '100%';
+
+            const badge = document.getElementById('q-type-badge');
+            const qText = document.getElementById('question-text');
+            const optionsGrid = document.getElementById('options-grid');
+            optionsGrid.innerHTML = '';
+
+            // 意味バッジ・問題文ともにふりがなを適応
+            badge.innerHTML = `💡 [${qData.cat}] この<ruby>意味<rt>いみ</rt></ruby>のことわざは？`;
+            badge.className = "text-xs font-bold text-amber-800 bg-amber-100 inline-block px-2.5 py-0.5 rounded-full mb-2 w-max ruby-text";
+            qText.innerHTML = `「<span class="text-indigo-600 font-extrabold">${qData.meaning}</span>」`;
+
+            const choices = generateChoices(qData);
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = "btn-bounce bg-white hover:bg-amber-50 text-slate-800 font-bold p-3 rounded-xl border-2 border-slate-200 shadow text-left flex items-center justify-between text-sm sm:text-base ruby-text";
+                btn.innerHTML = `<span>${choice.kotowaza}</span> <i class="fa-regular fa-circle text-slate-300"></i>`;
+                btn.onclick = () => checkAnswer(choice.id === qData.id, btn);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function generateChoices(correctItem) {
+            const wrongOptions = PROVERBS.filter(item => item.id !== correctItem.id)
+                                         .sort(() => 0.5 - Math.random())
+                                         .slice(0, 3);
+            return [...wrongOptions, correctItem].sort(() => 0.5 - Math.random());
+        }
+
+        function checkAnswer(isCorrect, btnElement) {
+            const qCard = document.getElementById('question-card');
+            const monsterAvatar = document.getElementById('monster-avatar');
+            const qData = gameState.questions[gameState.currentQuestionIndex];
+
+            const allBtns = document.querySelectorAll('#options-grid button');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                sound.playCorrect();
+                btnElement.classList.remove('bg-white', 'border-slate-200');
+                btnElement.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900');
+                btnElement.querySelector('i').className = "fa-solid fa-circle-check text-emerald-500 text-xl";
+
+                monsterAvatar.classList.add('animate-shake');
+                document.getElementById('monster-hp').style.width = '0%';
+
+                confetti({
+                    particleCount: 40,
+                    spread: 60,
+                    origin: { y: 0.7 }
+                });
+
+                gameState.unlockedProverbs.add(qData.id);
+
+                gameState.combo++;
+                gameState.correctCount++;
+                const comboBonus = (gameState.combo - 1) * 20;
+                const earnedScore = 100 + comboBonus;
+                gameState.score += earnedScore;
+
+                document.getElementById('quiz-score').innerText = gameState.score;
+                updateComboUI();
+
+            } else {
+                sound.playWrong();
+                btnElement.classList.remove('bg-white', 'border-slate-200');
+                btnElement.classList.add('bg-rose-100', 'border-rose-500', 'text-rose-900');
+                btnElement.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-500 text-xl";
+
+                qCard.classList.add('animate-shake');
+                gameState.combo = 0;
+                updateComboUI();
+            }
+
+            // Save Progress Data on Cloud
+            if (typeof window.saveGameData === 'function') {
+                window.saveGameData();
+            }
+
+            setTimeout(() => {
+                monsterAvatar.classList.remove('animate-shake');
+                qCard.classList.remove('animate-shake');
+
+                gameState.currentQuestionIndex++;
+                if (gameState.currentQuestionIndex < gameState.questions.length) {
+                    loadQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 1200);
+        }
+
+        function updateComboUI() {
+            const badge = document.getElementById('combo-badge');
+            if (gameState.combo > 1) {
+                badge.classList.remove('hidden');
+                document.getElementById('combo-count').innerText = gameState.combo;
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function finishQuiz() {
+            showScreen('result');
+            sound.playLevelUp();
+
+            document.getElementById('result-correct').innerText = gameState.correctCount;
+            document.getElementById('result-score').innerText = `${gameState.score} 点`;
+
+            const expGained = gameState.score / 2;
+            document.getElementById('result-exp').innerText = `+${expGained} EXP`;
+
+            gameState.exp += expGained;
+            const expNeeded = gameState.level * 100;
+
+            const levelMsg = document.getElementById('level-up-msg');
+            if (gameState.exp >= expNeeded) {
+                gameState.level++;
+                gameState.exp -= expNeeded;
+                levelMsg.innerText = `🎉 レベルアップ！ Lv.${gameState.level} になった！`;
+            } else {
+                levelMsg.innerText = `つぎのレベルまで あと ${expNeeded - gameState.exp} EXP`;
+            }
+
+            updateTitleAndLevel();
+
+            // Save progress to cloud
+            if (typeof window.saveGameData === 'function') {
+                window.saveGameData();
+            }
+
+            setTimeout(() => {
+                const percent = Math.min((gameState.exp / (gameState.level * 100)) * 100, 100);
+                document.getElementById('exp-bar').style.width = `${percent}%`;
+            }, 300);
+        }
+
+        function setupZukanCategories() {
+            const catContainer = document.getElementById('zukan-categories');
+            catContainer.innerHTML = '';
+
+            const categories = ["すべて", ...new Set(PROVERBS.map(p => p.cat))];
+
+            categories.forEach(cat => {
+                const badge = document.createElement('button');
+                const isSelected = gameState.selectedCategoryFilter === cat;
+                badge.className = `px-3 py-1 rounded-full whitespace-nowrap transition-colors font-bold ${
+                    isSelected 
+                        ? 'bg-amber-400 text-slate-900 shadow' 
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                }`;
+                badge.innerText = cat;
+                badge.onclick = () => {
+                    gameState.selectedCategoryFilter = cat;
+                    setupZukanCategories();
+                    renderZukan();
+                };
+                catContainer.appendChild(badge);
+            });
+        }
+
+        function renderZukan() {
+            const listContainer = document.getElementById('zukan-list');
+            listContainer.innerHTML = '';
+
+            document.getElementById('zukan-count').innerText = gameState.unlockedProverbs.size;
+
+            const filtered = gameState.selectedCategoryFilter === "すべて"
+                ? PROVERBS
+                : PROVERBS.filter(p => p.cat === gameState.selectedCategoryFilter);
+
+            filtered.forEach(item => {
+                const isUnlocked = gameState.unlockedProverbs.has(item.id);
+                const card = document.createElement('div');
+
+                if (isUnlocked) {
+                    card.className = "bg-slate-800 border-2 border-amber-400/60 rounded-xl p-3.5 shadow";
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-base sm:text-lg font-bold text-amber-300 ruby-text">${item.kotowaza}</h3>
+                            <span class="text-xs bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 whitespace-nowrap"><i class="fa-solid fa-check"></i> はっけん</span>
+                        </div>
+                        <div class="text-[10px] text-amber-400/80 mb-1 font-bold">ジャンル: ${item.cat}</div>
+                        <p class="text-xs sm:text-sm text-slate-200 mb-2 leading-relaxed ruby-text">${item.meaning}</p>
+                        <div class="text-xs bg-slate-900/80 p-2 rounded text-indigo-200 border border-slate-700 ruby-text">
+                            💬 ${item.example}
+                        </div>
+                    `;
+                } else {
+                    card.className = "bg-slate-800/50 border border-slate-700 rounded-xl p-3 opacity-60 flex items-center space-x-3";
+                    card.innerHTML = `
+                        <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center text-slate-500 text-lg flex-shrink-0">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-slate-400"> No.${item.id} ？？？？？</div>
+                            <div class="text-xs text-slate-500">ジャンル: ${item.cat}（クイズで正解すると解放！）</div>
+                        </div>
+                    `;
+                }
+
+                listContainer.appendChild(card);
+            });
+
+            showScreen('zukan');
+        }
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            sound.init();
+            startQuiz();
+        });
+
+        document.getElementById('retry-btn').addEventListener('click', () => {
+            startQuiz();
+        });
+
+        document.getElementById('back-to-start-btn').addEventListener('click', () => {
+            showScreen('start');
+        });
+
+        document.getElementById('zukan-btn').addEventListener('click', () => {
+            sound.init();
+            setupZukanCategories();
+            renderZukan();
+        });
+
+        document.getElementById('zukan-back-btn').addEventListener('click', () => {
+            showScreen('start');
+        });
+
+        document.getElementById('quiz-quit-btn').addEventListener('click', () => {
+            showScreen('start');
+        });
+
+        // Initialize Level Display
+        updateTitleAndLevel();
+    </script>
+</body>
+</html>
